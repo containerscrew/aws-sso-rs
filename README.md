@@ -1,8 +1,7 @@
 <p align="center" >
-    <img src="assets/rust-logo.svg" alt="logo" width="250"/>
-<h3 align="center">aws-sso-auth</h3>
+<h3 align="center">aws-sso-rs</h3>
 <p align="center">Fetch your local ~/.aws/credentials using AWS SSO</p>
-<p align="center">Build with ❤ in Rust</p>
+<p align="center">Built with ❤ in Rust</p>
 </p>
 
 <p align="center" >
@@ -22,39 +21,6 @@
       <img alt="GitHub Releases Stats" src="https://img.shields.io/github/downloads/containerscrew/aws-sso-auth/total.svg?logo=github">
     </a>
 </p>
-
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [Pipeline badges](#pipeline-badges)
-- [Introduction](#introduction)
-- [Requirements](#requirements)
-- [Supported platforms](#supported-platforms)
-- [Supported IDP](#supported-idp)
-- [Installation](#installation)
-  - [Quick installation (latest version)](#quick-installation-latest-version)
-  - [Using cargo](#using-cargo)
-  - [Build locally](#build-locally)
-- [Usage](#usage)
-  - [Setup configuration](#setup-configuration)
-  - [Start fetching credentials](#start-fetching-credentials)
-  - [Debug logging](#debug-logging)
-  - [Check version](#check-version)
-  - [Help command](#help-command)
-  - [Take a look inside `~/.aws/credentials`](#take-a-look-inside-awscredentials)
-  - [Example of credentials file](#example-of-credentials-file)
-- [Switching accounts in your terminal](#switching-accounts-in-your-terminal)
-  - [Zsh/Bash shell](#zshbash-shell)
-  - [Fish shell](#fish-shell)
-  - [Setting AWS_PROFILE](#setting-aws_profile)
-- [Examples](#examples)
-- [TO DO (not implemented yet)](#to-do-not-implemented-yet)
-- [Contribution](#contribution)
-- [LICENSE](#license)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Pipeline badges
 ![Test Status](https://github.com/containerscrew/aws-sso-auth/actions/workflows/test.yml/badge.svg)

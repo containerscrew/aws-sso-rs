@@ -1,36 +1,23 @@
-use crate::commands::config::CREDENTIALS_FILE_PATH;
-use aws_sso_auth::AccountCredentials;
+use crate::aws::AccountCredentials;
+use crate::println_orange;
 use colored::Colorize;
 use configparser::ini::Ini;
-use log::{error, info};
 use std::io;
-
-pub fn print_banner() {
-    let banner = r#"
-                                                  |    |
-    ,---.. . .,---.   ,---.,---.,---.   ,---..   .|--- |---.
-    ,---|| | |`---.---`---.`---.|   |---,---||   ||    |   |
-    `---^`-'-'`---'   `---'`---'`---'   `---^`---'`---'`   '
-
-    Author: github.com/containerscrew
-    License: GNU AFFERO GENERAL PUBLIC LICENSE V3
-    Description: Fetch your local ~/.aws/credentials using AWS SSO
-"#;
-
-    println!("{}", banner.truecolor(255, 165, 0));
-}
+use tracing::error;
 
 pub fn open_browser_url(url: &String) {
     // From the device authorization, open the URL in the browser
     if webbrowser::open(&*url).is_ok() {
-        info!("Web browser opened correctly!")
+        println_orange!(
+            "Opening your default web browser to complete the authentication process..."
+        );
     } else {
-        error!("Problems with WebBrowser")
+        error!("Opening your default browser to complete the authentication process...");
     }
 }
 
 pub fn read_user_input() {
-    info!("Type ENTER to continue");
+    println_orange!("Type ENTER to continue");
     let mut buffer = String::new();
     io::stdin()
         .read_line(&mut buffer)
@@ -40,6 +27,8 @@ pub fn read_user_input() {
 pub fn extend_path(path: &str) -> String {
     shellexpand::tilde(path).to_string()
 }
+
+const CREDENTIALS_FILE_PATH: &str = "~/.aws/credentials-test";
 
 pub fn write_configuration(all_credentials: Vec<AccountCredentials>, region_name: String) {
     //Start configparser to write data
@@ -74,28 +63,5 @@ pub fn write_configuration(all_credentials: Vec<AccountCredentials>, region_name
         };
     }
 
-    info!("Configuration file saved: {}", CREDENTIALS_FILE_PATH)
+    // info!("Configuration file saved: {}", CREDENTIALS_FILE_PATH)
 }
-
-// pub fn config_file_exists(path: &str) {
-//     // This function checks if config file ~/.aws/aws-sso-auth.json exists
-//     // If not, will try to create a new one
-//     let expanded_path = extend_path(path);
-//     let directory_path = Path::new(&expanded_path);
-
-//     match directory_path.metadata() {
-//         Ok(metadata) => {
-//             if metadata.is_file() {
-//                 info!("Config file exists: {}", &path);
-//             }
-//         }
-//         Err(_) => {
-//             error!("Config file don't exists {}.", &expanded_path);
-//             // If config file don't exists, try to create a new one
-//             // match File::create(&expanded_path) {
-//             //     Ok(_) => info!("File {} created", &expanded_path),
-//             //     Err(err) => error!("Can't create file. {}", err),
-//             // }
-//         }
-//     }
-// }

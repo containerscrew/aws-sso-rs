@@ -1,3 +1,0 @@
-project=aws-sso-auth
-user=aws-sso-auth
-exclude-labels=duplicate,question,invalid,wontfix,weekly-digest,dependencies

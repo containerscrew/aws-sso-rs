@@ -1,32 +1,50 @@
-use crate::commands::config::read_config_file;
-use crate::commands::config::Configuration;
-use crate::commands::start::start;
-use crate::logger::setup_logger;
-use clap::{Parser, Subcommand};
-use std::error::Error;
+use clap::Parser;
+use current_platform::CURRENT_PLATFORM;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[clap(
-    about = "aws-sso-auth",
+    about = "aws-sso-rs",
     version = env!("CARGO_PKG_VERSION"),
-    author = "Daniels info@containerscrew.com",
-    about = "Get your ~/.aws/credentials using AWS SSO and your external IDP",
+    author = "containerscrew info@containerscrew.com",
+    about = print_about(),
     arg_required_else_help = true
 )]
-pub struct Cli {
-    #[command(subcommand)]
-    command: Option<Commands>,
+pub struct Args {
     #[arg(
         short = 'l',
         long = "log-level",
-        help = "Log level for logging tracing. Possible values: info, warn, trace, debug, error. Default: info",
+        help = "Log level for logging tracing",
         default_value = "info",
+        value_parser = ["info", "warn", "trace", "debug", "error"],
         required = false
     )]
-    log_level: String,
+    pub log_level: String,
+    #[arg(
+        short = 's',
+        long = "start-url",
+        help = "AWS start URL endpoint. Example: https://XXXXXX.awsapps.com/start",
+        required = true
+    )]
+    pub start_url: String,
+    #[arg(
+        short = 'r',
+        long = "aws-region",
+        help = "AWS region where you have configured SSO",
+        required = true,
+        default_value = "us-east-1"
+    )]
+    pub aws_region: String,
 }
 
-#[derive(Subcommand)]
+fn print_about() -> String {
+    format!(
+        "aws-sso-rs v{} - Fetch your ~/.aws/credentials using AWS SSO and your external IDP \n Running on platform: {}",
+        env!("CARGO_PKG_VERSION"),
+        CURRENT_PLATFORM
+    )
+}
+
+/*#[derive(Subcommand)]
 enum Commands {
     /// Set your configuration for all your AWS SSO portals. Will be saved in ~/.aws/aws-sso-auth.json
     Config {
@@ -73,8 +91,8 @@ enum Commands {
         retries: u32,
     },
 }
-
-pub fn argparse() -> Result<Cli, Box<dyn Error>> {
+*/
+/*pub fn argparse() -> Result<Cli, Box<dyn Error>> {
     let cli = Cli::parse();
 
     match &cli.command {
@@ -115,4 +133,4 @@ pub fn argparse() -> Result<Cli, Box<dyn Error>> {
 
     // Return cli
     Ok(cli)
-}
+}*/
