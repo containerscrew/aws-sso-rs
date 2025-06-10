@@ -1,23 +1,20 @@
 use crate::aws::AccountCredentials;
-use crate::println_orange;
-use colored::Colorize;
 use configparser::ini::Ini;
 use std::io;
-use tracing::error;
+use std::io::Write;
+use tracing::{error, info};
 
 pub fn open_browser_url(url: &String) {
     // From the device authorization, open the URL in the browser
     if webbrowser::open(&*url).is_ok() {
-        println_orange!(
-            "Opening your default web browser to complete the authentication process..."
-        );
+        info!("Opening your default web browser to complete the authentication process");
     } else {
-        error!("Opening your default browser to complete the authentication process...");
+        error!("Opening your default browser to complete the authentication process");
     }
 }
-
 pub fn read_user_input() {
-    println_orange!("Type ENTER to continue");
+    info!("Type ENTER to continue");
+    io::stdout().flush().unwrap();
     let mut buffer = String::new();
     io::stdin()
         .read_line(&mut buffer)
@@ -28,7 +25,7 @@ pub fn extend_path(path: &str) -> String {
     shellexpand::tilde(path).to_string()
 }
 
-const CREDENTIALS_FILE_PATH: &str = "~/.aws/credentials-test";
+const CREDENTIALS_FILE_PATH: &str = "~/.aws/credentials";
 
 pub fn write_configuration(all_credentials: Vec<AccountCredentials>, region_name: String) {
     //Start configparser to write data
@@ -63,5 +60,5 @@ pub fn write_configuration(all_credentials: Vec<AccountCredentials>, region_name
         };
     }
 
-    // info!("Configuration file saved: {}", CREDENTIALS_FILE_PATH)
+    info!("Configuration file saved: {}", CREDENTIALS_FILE_PATH)
 }
