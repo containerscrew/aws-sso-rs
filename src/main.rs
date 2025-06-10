@@ -8,25 +8,27 @@ use crate::logger::setup_logger;
 use crate::utils::{open_browser_url, read_user_input, write_configuration};
 use clap::Parser;
 use colored::Colorize;
-use tracing::error;
+use tracing::{error, info};
 
 mod aws;
 mod cli;
 mod logger;
-mod macros;
 
 mod utils;
 
 const RETRIES: u32 = 8;
+
+// #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Setup cli
     let cli = Args::parse();
 
-    println_orange!("If you want to debug AWS SDK errors, run the program using: $ aws-sso-rs --log-level debug --start-url ...");
-
     // Logging
     setup_logger(&cli.log_level);
+
+    info!("Welcome to {}!", "aws-sso-rs".truecolor(255, 165, 0));
+    info!("If you want to debug AWS SDK errors, run the program using: $ aws-sso-rs --log-level debug --start-url ...");
 
     // Start AWS SDK APi Calls
     let config = aws::init_config(&cli.aws_region).await;
@@ -64,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get account list using the previous generate token
     let account_list = get_account_list(&sso_client, &token).await?;
 
-    println_orange!("{} AWS accounts", account_list.len());
+    info!("Found {} AWS accounts", account_list.len());
 
     let mut all_credentials: Vec<AccountCredentials> = vec![];
 
