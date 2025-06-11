@@ -1,20 +1,20 @@
-name: Build 🪛
+name: Release 📦
+
+permissions:
+  contents: write
+  pull-requests: write
 
 on:
-  pull_request:
   push:
-    paths:
-      - 'src/**'
-      - '.github/workflows/build.yml'
-    branches:
-      - '**'
+    tags:
+      - 'v*.*.*'
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   release:
-    name: Build - ${{ matrix.platform.release_for }}
+    name: Release for - ${{ matrix.platform.release_for }}
     strategy:
       matrix:
         platform:
@@ -39,6 +39,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set tag
+        id: set_tag
+        run: |
+          # Extract the tag name from the full reference
+          TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')
+          echo "TAG_NAME=$TAG_NAME" >> "$GITHUB_ENV"
+
       - name: Setup dependencies
         if: matrix.platform.os == 'ubuntu-latest'
         run: |
@@ -54,6 +61,20 @@ jobs:
         run: |
           cargo build --release --target ${{ matrix.platform.target }}
 
-      - name: Test package zip
+      - name: Package zip
         run: |
           zip -j aws-sso-rs-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/aws-sso-rs
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: '[Changelog](https://github.com/containerscrew/aws-sso-rs/blob/main/CHANGELOG.md)'
+          files: |
+            CHANGELOG.md
+            LICENSE
+            *.zip
+        env:
+          token: ${{ secrets.CI_TOKEN }}
+          generate_release_notes: true
+          append_body: true
+          TAG_NAME:
