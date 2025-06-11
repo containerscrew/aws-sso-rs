@@ -7,7 +7,8 @@ use console::style;
     version = env!("CARGO_PKG_VERSION"),
     author = "containerscrew info@containerscrew.com",
     about = print_about(),
-    arg_required_else_help = true
+    arg_required_else_help = true,
+    after_help = print_after_help_message(),
 )]
 pub struct Args {
     #[arg(
@@ -68,4 +69,8 @@ fn print_about() -> String {
         style("aws-sso-rs").bold().red(),
         env!("CARGO_PKG_VERSION"),
     )
+}
+
+fn print_after_help_message() -> String {
+    format!("Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: https://github.com/containerscrew/aws-sso-rs/issues")
 }
