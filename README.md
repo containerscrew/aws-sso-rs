@@ -18,7 +18,7 @@
 ---
 <p align="center">
     <h3 align="center">$ aws-sso-rs </h3>
-    <img src="./examples/example.png" alt="example"/>
+    <img src="./assets/example-1.png" alt="example"/>
 </p>
 
 ---
