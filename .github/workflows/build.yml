@@ -1,13 +1,16 @@
-name: Build 📦
-
-permissions:
-  contents: write
-  pull-requests: write
+name: Build 🪛
 
 on:
+  pull_request:
   push:
-    tags:
-      - 'v*.*.*'
+    paths:
+      - 'src/**'
+      - '.github/workflows/build.yml'
+    branches:
+      - '**'
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   release:
@@ -16,54 +19,37 @@ jobs:
       matrix:
         platform:
           - release_for: linux-arm64
-            os: ubuntu-latest
+            os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            bin: aws-sso-auth
-            command: build
 
           - release_for: linux-amd64
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            bin: aws-sso-auth
-            command: build
+            os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
 
           - release_for: darwin-amd64
             os: macOS-latest
             target: x86_64-apple-darwin
-            bin: aws-sso-auth
-            command: build
 
           - release_for: darwin-arm64
             os: macOS-latest
             target: aarch64-apple-darwin
-            bin: aws-sso-auth
-            command: build
 
     runs-on: ${{ matrix.platform.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup MUSL
+        uses: actions/checkout@v4
+
+      - name: Setup dependencies
         if: matrix.platform.os == 'ubuntu-latest'
         run: |
-          sudo apt-get -qq install musl-tools
-      - name: Build binary
-        uses: houseabsolute/actions-rust-cross@v0
-        with:
-          command: ${{ matrix.platform.command }}
-          target: ${{ matrix.platform.target }}
-          args: "--release"
-          strip: true
-      - name: Package zip
-        run: |
-          make package ARCH=${{ matrix.platform.release_for }} TARGET=${{ matrix.platform.target }}
+          sudo apt-get -y install linux-headers-$(uname -r)
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          #body: '[Changelog](https://github.com/containerscrew/aws-sso-auth/blob/main/CHANGELOG.md)'
-          files: "*.zip"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          generate_release_notes: true
-          append_body: true
+      - name: Rustup
+        run: |
+          rustup install stable
+          rustup default stable
+          rustup target add ${{ matrix.platform.target }}
+
+      - name: Build
+        run: |
+          cargo build --release --target ${{ matrix.platform.target }}

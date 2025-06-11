@@ -7,8 +7,12 @@ use crate::cli::Args;
 use crate::logger::setup_logger;
 use crate::utils::{open_browser_url, read_user_input, write_configuration};
 use clap::Parser;
-use colored::Colorize;
-use tracing::{error, info};
+use console::{style, Emoji};
+use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::time::Instant;
+use tracing::error;
 
 mod aws;
 mod cli;
@@ -16,19 +20,24 @@ mod logger;
 
 mod utils;
 
-const RETRIES: u32 = 8;
+const RETRIES: u32 = 7;
+
+static SPARKLE: Emoji<'_, '_> = Emoji("✨", ":-)");
 
 // #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!(
+        "~> Welcome to {} \n~> Press ENTER when you accept the request in your browser",
+        style("aws-sso-rs").bold().red(),
+    );
+
+    let started = Instant::now();
     // Setup cli
     let cli = Args::parse();
 
     // Logging
     setup_logger(&cli.log_level);
-
-    info!("Welcome to {}!", "aws-sso-rs".truecolor(255, 165, 0));
-    info!("If you want to debug AWS SDK errors, run the program using: $ aws-sso-rs --log-level debug --start-url ...");
 
     // Start AWS SDK APi Calls
     let config = aws::init_config(&cli.aws_region).await;
@@ -56,27 +65,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     read_user_input();
 
     // Generate token
-    let token = generate_token(
-        &sso_idc_client,
-        &device_credentials,
-        &device_auth_credentials,
-    )
-    .await?;
+    let token = Arc::new(
+        generate_token(
+            &sso_idc_client,
+            &device_credentials,
+            &device_auth_credentials,
+        )
+        .await?,
+    );
 
     // Get account list using the previous generate token
     let account_list = get_account_list(&sso_client, &token).await?;
-
-    info!("Found {} AWS accounts", account_list.len());
 
     let mut all_credentials: Vec<AccountCredentials> = vec![];
 
     // Store all join handles
     let mut join_handles = Vec::new();
 
+    let pb = Arc::new(ProgressBar::new(account_list.len() as u64));
+    pb.set_style(
+        ProgressStyle::with_template(
+            "{spinner:.red} [{elapsed_precise}] [\x1b[38;5;208m{bar:40}\x1b[0m] {pos}/{len} {msg}",
+        )
+        .unwrap()
+        .progress_chars("##-"),
+    );
+
     // Iterate over all accounts and get credentials for each account
     for account in account_list {
         let sso_client = sso_client.clone();
-        let token = token.clone();
+        let token = Arc::clone(&token);
+        let pb = Arc::clone(&pb);
+
         join_handles.push(tokio::spawn(async move {
             let account_name = &account.account_name.unwrap();
             let account_credentials = match get_account_credentials(
@@ -96,10 +116,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Err(err)
                 }
             };
+            pb.set_message(format!("{account_name}"));
+            pb.inc(1);
             account_credentials
         }));
 
-        // tokio::time::sleep(std::time::Duration::from_millis(100)).await; // Throttle requests to avoid rate limiting
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await; // Throttle requests to avoid rate limiting
     }
 
     // Wait for all tasks to complete
@@ -111,7 +133,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Finally, write the config file
-    write_configuration(all_credentials, cli.aws_region);
+    let role_overrides: HashMap<String, String> = cli.role_overrides.unwrap().into_iter().collect();
+    let account_overrides: HashMap<String, String> =
+        cli.account_overrides.unwrap().into_iter().collect();
+    write_configuration(
+        all_credentials,
+        cli.aws_region,
+        role_overrides,
+        account_overrides,
+    );
+
+    println!("{}Done in {}", SPARKLE, HumanDuration(started.elapsed()));
 
     Ok(())
 }

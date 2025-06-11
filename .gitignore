@@ -17,6 +17,3 @@ Cargo.lock
 *.iml
 .idea/
 .vscode/
-
-# Test json config files
-*.test.json

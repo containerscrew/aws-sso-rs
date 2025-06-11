@@ -6,11 +6,11 @@ authors = ["containerscrew info@containerscrew.com"]
 rust-version = "1.87.0"
 repository = "https://github.com/containerscrew/aws-sso-rs"
 license-file = "LICENSE"
-description = "Fetch your ~/.aws/credentials using AWS SSO and your external IDP"
+description = "Fetch your ~/.aws/credentials using AWS SSO"
 
 [dependencies]
 current_platform = "0.2.0"
-colored = "2.0.4"
+console = "0.15.11"
 tracing-subscriber = { version = "0.3.17", features = ["json"] }
 tracing = "0.1.40"
 clap = { version = "4.4.18", features = ["derive"] }
@@ -21,3 +21,7 @@ aws-sdk-ssooidc = "0.39.0"
 webbrowser = "0.8.15"
 shellexpand = "3.1.1"
 configparser = "3.1.0"
+indicatif = "0.17.11"
+
+[profile.release]
+strip = "debuginfo"
