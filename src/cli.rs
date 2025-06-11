@@ -1,5 +1,5 @@
 use clap::Parser;
-use current_platform::CURRENT_PLATFORM;
+use console::style;
 
 #[derive(Parser, Debug)]
 #[clap(
@@ -22,7 +22,7 @@ pub struct Args {
     #[arg(
         short = 's',
         long = "start-url",
-        help = "AWS start URL endpoint. Example: https://XXXXXX.awsapps.com/start",
+        help = "AWS start URL endpoint. Example: https://company.awsapps.com/start",
         required = true
     )]
     pub start_url: String,
@@ -36,7 +36,7 @@ pub struct Args {
     pub aws_region: String,
     #[arg(
         long = "role-overrides",
-        help = "Override the role name in the profile ~/.aws/credentials. Default to [AccountName@RoleName]",
+        help = "Override the role name in the profile ~/.aws/credentials. Default to [AccountName@RoleName]. Ej: --role-overrides role1=newrolename,role2=newrolename2",
         value_parser = parse_key_val_string,
         value_delimiter = ',',
         num_args = 1..,
@@ -45,7 +45,7 @@ pub struct Args {
     pub role_overrides: Option<Vec<(String, String)>>,
     #[arg(
         long = "account-overrides",
-        help = "Override the account name in the profile ~/.aws/credentials. Default to [AccountName@RoleName]",
+        help = "Override the account name in the profile ~/.aws/credentials. Default to [AccountName@RoleName]. Ej: --account-overrides account1=newaccountname,account2=newaccountname2",
         value_parser = parse_key_val_string,
         value_delimiter = ',',
         num_args = 1..,
@@ -64,8 +64,8 @@ fn parse_key_val_string(s: &str) -> Result<(String, String), String> {
 
 fn print_about() -> String {
     format!(
-        "aws-sso-rs v{} - Fetch your ~/.aws/credentials using AWS SSO and your external IDP \n Running on platform: {}",
+        "{} v{} - Fetch your local ~/.aws/credentials using AWS SSO. \n",
+        style("aws-sso-rs").bold().red(),
         env!("CARGO_PKG_VERSION"),
-        CURRENT_PLATFORM
     )
 }

@@ -9,7 +9,6 @@ license-file = "LICENSE"
 description = "Fetch your ~/.aws/credentials using AWS SSO"
 
 [dependencies]
-current_platform = "0.2.0"
 console = "0.15.11"
 tracing-subscriber = { version = "0.3.17", features = ["json"] }
 tracing = "0.1.40"

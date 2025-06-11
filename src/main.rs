@@ -27,17 +27,19 @@ static SPARKLE: Emoji<'_, '_> = Emoji("✨", ":-)");
 // #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!(
-        "~> Welcome to {} \n~> Press ENTER when you accept the request in your browser",
-        style("aws-sso-rs").bold().red(),
-    );
-
     let started = Instant::now();
+
     // Setup cli
     let cli = Args::parse();
 
     // Logging
     setup_logger(&cli.log_level);
+
+    // Print welcome message
+    println!(
+        "~> Welcome to {} \n~> Press ENTER when you accept the request in your browser",
+        style("aws-sso-rs").bold().red(),
+    );
 
     // Start AWS SDK APi Calls
     let config = aws::init_config(&cli.aws_region).await;
