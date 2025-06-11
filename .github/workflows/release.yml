@@ -74,7 +74,7 @@ jobs:
             LICENSE
             *.zip
         env:
-          token: ${{ secrets.CI_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: true
           append_body: true
           TAG_NAME:

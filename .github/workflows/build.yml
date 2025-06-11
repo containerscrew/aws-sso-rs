@@ -44,6 +44,11 @@ jobs:
         run: |
           sudo apt-get -y install linux-headers-$(uname -r)
 
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "aws-sso-rs-v1"
+          cache-all-crates: true
+
       - name: Rustup
         run: |
           rustup install stable
