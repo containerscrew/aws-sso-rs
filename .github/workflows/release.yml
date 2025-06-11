@@ -63,7 +63,7 @@ jobs:
 
       - name: Package zip
         run: |
-          zip -j aws-sso-rs-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/aws-sso-rs
+          zip -j aws-sso-rs-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/${{ matrix.platform.target}}/release/aws-sso-rs
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -78,3 +78,17 @@ jobs:
           generate_release_notes: true
           append_body: true
           TAG_NAME:
+
+  publish-crate:
+    name: Publish crate to creates.io
+    needs:
+      - release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Publish to creates.io
+        uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          dry-run: false

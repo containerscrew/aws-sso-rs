@@ -56,4 +56,19 @@ jobs:
 
       - name: Test package zip
         run: |
-          zip -j aws-sso-rs-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/aws-sso-rs
+          TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')
+          zip -j aws-sso-rs-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/${{ matrix.platform.target}}/release/aws-sso-rs
+
+  publish-crate:
+    name: Publish crate to creates.io
+    needs:
+      - release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Publish to creates.io
+        uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          dry-run: true
