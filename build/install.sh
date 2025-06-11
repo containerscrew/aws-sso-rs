@@ -72,7 +72,7 @@ download_release() {
   if [ -z "$1" ]; then VERSION=$LATEST_VERSION; else VERSION=$1; fi
 
   printf "\033[0;32m[info] - Downloading version: ${VERSION}/$BINARY_NAME-${OS}-${cli_arch}.zip \033[0m\n"
-  curl -L --fail --remote-name-all https://github.com/containerscrew/$BINARY_NAME/releases/download/"${VERSION}"/$BINARY_NAME-"${OS}"-"$LATEST_VERSION".zip -o /tmp/$BINARY_NAME.zip
+  curl -L --fail --remote-name-all https://github.com/containerscrew/$BINARY_NAME/releases/download/"${VERSION}"/$BINARY_NAME-"${OS}"-"$VERSION".zip -o /tmp/$BINARY_NAME.zip
   unzip -o /tmp/$BINARY_NAME.zip -d /tmp/
 }
 
