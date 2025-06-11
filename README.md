@@ -175,6 +175,11 @@ source ~/.config/fish/config.fish
 Type `aws-profile` in your terminal, and you will see all the accounts you have credentials in your
 `$HOME/.aws/credentials`
 
+<p align="center">
+    <h3 align="center">$ aws-profile </h3>
+    <img src="./assets/example-2.png" alt="example"/>
+</p>
+
 > **fzf** is needed as a dependency for the interactive account switcher
 
 # LICENSE
