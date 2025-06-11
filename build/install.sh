@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -7,7 +7,8 @@ INSTALLATION_PATH="/usr/local/bin/"
 BINARY_NAME="aws-sso-rs"
 
 # Welcome message
-echo -e "Welcome to the $BINARY_NAME installation script! 🚀. \nAuthor: github.com/containerscrew"
+echo "Welcome to the $BINARY_NAME installation script! 🚀."
+echo "Author: github.com/containerscrew"
 
 happyexit(){
   echo ""
