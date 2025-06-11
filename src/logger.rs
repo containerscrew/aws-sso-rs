@@ -9,7 +9,9 @@ pub fn setup_logger(log_level: &String) {
     };
 
     tracing_subscriber::fmt()
-        .with_thread_names(true)
+        .with_thread_names(false)
+        .with_target(false)
         .with_max_level(log_level)
+        .without_time()
         .init();
 }

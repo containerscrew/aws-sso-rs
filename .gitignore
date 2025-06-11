@@ -13,10 +13,7 @@ Cargo.lock
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
-# Jetbrains
+# Jetbrains and Vscode
 *.iml
 .idea/
-
-
-# Test json config files
-*.test.json
+.vscode/

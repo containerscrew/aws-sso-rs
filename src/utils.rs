@@ -1,36 +1,18 @@
-use crate::commands::config::CREDENTIALS_FILE_PATH;
-use aws_sso_auth::AccountCredentials;
-use colored::Colorize;
+use crate::aws::AccountCredentials;
 use configparser::ini::Ini;
-use log::{error, info};
+use std::collections::HashMap;
 use std::io;
-
-pub fn print_banner() {
-    let banner = r#"
-                                                  |    |
-    ,---.. . .,---.   ,---.,---.,---.   ,---..   .|--- |---.
-    ,---|| | |`---.---`---.`---.|   |---,---||   ||    |   |
-    `---^`-'-'`---'   `---'`---'`---'   `---^`---'`---'`   '
-
-    Author: github.com/containerscrew
-    License: GNU AFFERO GENERAL PUBLIC LICENSE V3
-    Description: Fetch your local ~/.aws/credentials using AWS SSO
-"#;
-
-    println!("{}", banner.truecolor(255, 165, 0));
-}
+use std::io::Write;
+use tracing::error;
 
 pub fn open_browser_url(url: &String) {
     // From the device authorization, open the URL in the browser
-    if webbrowser::open(&*url).is_ok() {
-        info!("Web browser opened correctly!")
-    } else {
-        error!("Problems with WebBrowser")
+    if !webbrowser::open(&*url).is_ok() {
+        error!("Opening your default browser to complete the authentication process");
     }
 }
-
 pub fn read_user_input() {
-    info!("Type ENTER to continue");
+    io::stdout().flush().unwrap();
     let mut buffer = String::new();
     io::stdin()
         .read_line(&mut buffer)
@@ -41,61 +23,52 @@ pub fn extend_path(path: &str) -> String {
     shellexpand::tilde(path).to_string()
 }
 
-pub fn write_configuration(all_credentials: Vec<AccountCredentials>, region_name: String) {
-    //Start configparser to write data
+const CREDENTIALS_FILE_PATH: &str = "~/.aws/credentials";
+
+pub fn write_configuration(
+    all_credentials: Vec<AccountCredentials>,
+    region_name: String,
+    role_overrides: HashMap<String, String>,
+    account_overrides: HashMap<String, String>,
+) {
     let mut configuration = Ini::new_cs();
     let file_path = extend_path(CREDENTIALS_FILE_PATH);
 
     for creds in all_credentials {
-        configuration.set(
-            &format!("{}@{}", creds.account_name, creds.role_name),
-            "region",
-            Some(region_name.parse().unwrap()),
-        );
-        configuration.set(
-            &format!("{}@{}", creds.account_name, creds.role_name),
-            "aws_access_key_id",
-            Option::from(creds.aws_access_key_id),
-        );
-        configuration.set(
-            &format!("{}@{}", creds.account_name, creds.role_name),
-            "aws_secret_access_key",
-            Option::from(creds.aws_secret_access_key),
-        );
-        configuration.set(
-            &format!("{}@{}", creds.account_name, creds.role_name),
-            "aws_session_token",
-            Option::from(creds.aws_session_token),
-        );
+        let account_name = &creds.account_name;
+        let role_name = &creds.role_name;
 
-        match configuration.write(&file_path) {
-            Ok(_) => {}
-            Err(err) => error!("Error writing configuration file {}", err),
+        let account_part = account_overrides
+            .get(account_name)
+            .cloned()
+            .unwrap_or_else(|| account_name.clone());
+
+        // Check for override
+        let profile_name = match role_overrides.get(role_name) {
+            Some(override_val) if override_val.is_empty() => account_part.clone(),
+            Some(override_val) => override_val.clone(),
+            None => format!("{account_part}@{role_name}"),
         };
+
+        configuration.set(&profile_name, "region", Some(region_name.clone()));
+        configuration.set(
+            &profile_name,
+            "aws_access_key_id",
+            Some(creds.aws_access_key_id),
+        );
+        configuration.set(
+            &profile_name,
+            "aws_secret_access_key",
+            Some(creds.aws_secret_access_key),
+        );
+        configuration.set(
+            &profile_name,
+            "aws_session_token",
+            Some(creds.aws_session_token),
+        );
+
+        if let Err(err) = configuration.write(&file_path) {
+            error!("Error writing configuration file: {}", err);
+        }
     }
-
-    info!("Configuration file saved: {}", CREDENTIALS_FILE_PATH)
 }
-
-// pub fn config_file_exists(path: &str) {
-//     // This function checks if config file ~/.aws/aws-sso-auth.json exists
-//     // If not, will try to create a new one
-//     let expanded_path = extend_path(path);
-//     let directory_path = Path::new(&expanded_path);
-
-//     match directory_path.metadata() {
-//         Ok(metadata) => {
-//             if metadata.is_file() {
-//                 info!("Config file exists: {}", &path);
-//             }
-//         }
-//         Err(_) => {
-//             error!("Config file don't exists {}.", &expanded_path);
-//             // If config file don't exists, try to create a new one
-//             // match File::create(&expanded_path) {
-//             //     Ok(_) => info!("File {} created", &expanded_path),
-//             //     Err(err) => error!("Can't create file. {}", err),
-//             // }
-//         }
-//     }
-// }
