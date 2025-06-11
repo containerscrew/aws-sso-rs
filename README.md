@@ -9,10 +9,10 @@
 [![License - MIT](https://img.shields.io/github/license/containerscrew/aws-sso-rs)](/LICENSE)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 ![Code Size](https://img.shields.io/github/languages/code-size/containerscrew/aws-sso-rs)
-[![Build Pipeline](https://github.com/containerscrew/nflux/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/build.yml)
+[![Build Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/build.yml)
 [![Lint Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/lint.yml/badge.svg)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/lint.yml)
-[![Release Pipeline](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
-[![Release](https://img.shields.io/github/release/containerscrew/nflux)](https://github.com/containerscrew/nflux/releases/latest)
+[![Release Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/release.yml)
+[![Release](https://img.shields.io/github/release/containerscrew/aws-sso-rs)](https://github.com/containerscrew/aws-sso-rs/releases/latest)
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/aws-sso-rs/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=aws-sso-rs)
 ![Crates.io Version](https://img.shields.io/crates/v/aws-sso-rs)
 ---
@@ -49,6 +49,18 @@ Therefore, you’ll need:
 cargo install aws-sso-rs
 ```
 
+## Latest binary release
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/build/install.sh | sh
+```
+
+### Specific binary version
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/build/install.sh | sh -s -- -v "v1.1.0"
+```
+
 ## Source code
 
 ```shell
@@ -69,7 +81,7 @@ aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-
 * `--start-url` is the URL of your AWS SSO endpoint, which you can find in your AWS SSO console.
 * `--aws-region` is the AWS region where your SSO is configured, e.g., `eu-west-1`, `us-east-1`, etc.
 
-[!NOTE]
+> [!NOTE]
 > This command will open your default browser. You will need to approve manually the authentication.
 
 After you authenticate, you will come back to the terminal, and you will need to press `Enter` to continue.
@@ -135,8 +147,6 @@ Then, `source` the file if needed:
 ```shell
 source ~/.zshrc or source ~/.bashrc
 ```
-
-``
 
 ## Fish shell
 
