@@ -133,9 +133,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Finally, write the config file
-    let role_overrides: HashMap<String, String> = cli.role_overrides.unwrap().into_iter().collect();
-    let account_overrides: HashMap<String, String> =
-        cli.account_overrides.unwrap().into_iter().collect();
+    let role_overrides: HashMap<String, String> =
+        cli.role_overrides.unwrap_or_default().into_iter().collect();
+    let account_overrides: HashMap<String, String> = cli
+        .account_overrides
+        .unwrap_or_default()
+        .into_iter()
+        .collect();
     write_configuration(
         all_credentials,
         cli.aws_region,
