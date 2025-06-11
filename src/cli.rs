@@ -72,5 +72,5 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!("Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: https://github.com/containerscrew/aws-sso-rs/issues")
+    format!("Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: github.com/containerscrew/aws-sso-rs/issues")
 }
