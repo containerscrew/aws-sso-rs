@@ -18,7 +18,7 @@ aws-config = "1.6.3"
 aws-sdk-sso = "0.39.0"
 tokio = { version = "1.45.0", features = ["full", "time"] }
 aws-sdk-ssooidc = "0.39.0"
-webbrowser = "0.8.15"
+webbrowser = "1.0.4"
 shellexpand = "3.1.1"
 configparser = "3.1.0"
 indicatif = "0.17.11"
