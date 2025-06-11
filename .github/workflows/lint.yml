@@ -1,0 +1,27 @@
+name: Lint 🤖
+
+on:
+  pull_request:
+  push:
+    paths:
+      - '**.rs'
+      - '.github/workflows/lint.yml'
+    branches:
+      - '**'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rusfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustup
+        run: |
+          rustup install stable
+          rustup default stable
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
