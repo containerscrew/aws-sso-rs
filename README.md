@@ -74,6 +74,8 @@ cargo build --release
 
 # Usage
 
+## Basic usage
+
 ```shell
 aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1
 ```
@@ -121,6 +123,12 @@ aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-
 
 ```ini
 [AccountName@Developer-Team] --> [AccountName@developer-role]
+```
+
+## Debug AWS SDK API calls
+
+```shell
+aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 --log-level debug
 ```
 
 # Switching `AWS_PROFILE` in your terminal
