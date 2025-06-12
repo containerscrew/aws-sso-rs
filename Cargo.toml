@@ -24,3 +24,6 @@ indicatif = "0.17.11"
 
 [profile.release]
 strip = "debuginfo"
+
+[dev-dependencies]
+mockall = "0.13.1"

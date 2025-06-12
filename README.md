@@ -26,7 +26,7 @@
 # About
 
 > [!NOTE]
-> Is this necessary in Rust? I don't think so. In Python, it could be 40/50 lines of code. But it's definitely more fun.
+> Is this necessary in Rust? I don't think so. In Python, it could be 50/60? lines of code. But it's definitely more fun.
 
 This is the tool I use every day to obtain local credentials (`~/.aws/credentials`) for all the accounts I have access
 in my company’s AWS organization. We have AWS SSO configured with Google Workspaces. So, through a browser authenticated
