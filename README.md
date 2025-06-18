@@ -26,7 +26,8 @@
 # About
 
 > [!NOTE]
-> Is this necessary in Rust? I don't think so. In Python, it could be 50/60? lines of code. But it's definitely more fun.
+> Is this necessary in Rust? I don't think so. In Python, it could be 50/60? lines of code. But it's definitely more
+> fun.
 
 This is the tool I use every day to obtain local credentials (`~/.aws/credentials`) for all the accounts I have access
 in my company’s AWS organization. We have AWS SSO configured with Google Workspaces. So, through a browser authenticated
@@ -55,13 +56,13 @@ cargo install aws-sso-rs
 ## Latest binary release
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/build/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/scripts/install.sh | sh
 ```
 
 ### Specific binary version
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/build/install.sh | sh -s -- -v "v1.1.0"
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/scripts/install.sh | sh -s -- -v "v1.1.0"
 ```
 
 ## Source code
