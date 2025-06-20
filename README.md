@@ -14,7 +14,7 @@
 [![Release Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/release.yml)
 [![Release](https://img.shields.io/github/release/containerscrew/aws-sso-rs)](https://github.com/containerscrew/aws-sso-rs/releases/latest)
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/aws-sso-rs/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=aws-sso-rs)
-![Crates.io Downloads (recent)](https://img.shields.io/crates/dr/aws-sso-rs)
+![Crates.io Downloads (recent)](https://img.shields.io/crates/dr/aws-sso-rs?style=for-the-badge&label=crates.io%20Downloads)
 ![Crates.io Version](https://img.shields.io/crates/v/aws-sso-rs)
 ---
 <p align="center">
