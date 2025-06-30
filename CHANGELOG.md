@@ -1,6 +1,9 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[1.3.0] - 2025-06-30](#130---2025-06-30)
+  - [[1.2.0] - 2025-06-11](#120---2025-06-11)
+  - [[1.1.0] - 2025-06-11](#110---2025-06-11)
   - [[1.0.0] - 2025-06-11](#100---2025-06-11)
   - [[0.4.1] - 2023-11-19](#041---2023-11-19)
   - [[0.4.0] - 2023-11-19](#040---2023-11-19)
@@ -11,6 +14,64 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [1.3.0] - 2025-06-30
+
+- Fix(cli): after help message
+
+- Update README
+
+- Doc and dev dependencies
+
+- Fix: install.sh help message
+
+- Move install.sh script to scripts/ folder
+
+- Update console requirement from 0.15.11 to 0.16.0
+
+Updates the requirements on [console](https://github.com/console-rs/console) to permit the latest version.
+- [Release notes](https://github.com/console-rs/console/releases)
+- [Changelog](https://github.com/console-rs/console/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/console-rs/console/compare/0.15.11...0.16.0)
+
+---
+updated-dependencies:
+- dependency-name: console
+  dependency-version: 0.16.0
+  dependency-type: direct:production
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #12 from containerscrew/dependabot/cargo/console-0.16.0
+
+Update console requirement from 0.15.11 to 0.16.0
+
+- Feat: print device code & improve log
+
+- Update pipeline dependencies
+
+- Restore release pipeline
+
+## [1.2.0] - 2025-06-11
+
+- Feat(cli): help message package metadata
+
+## [1.1.0] - 2025-06-11
+
+- Changelog & update README
+
+- Fix: install.sh script
+
+- Fix installation script
+
+- Fix: installation script arch
+
+- Refactor: cli help flag
+
+- Update Cargo.toml
+
+- Update Cargo.toml to 1.1.0
 
 ## [1.0.0] - 2025-06-11
 
