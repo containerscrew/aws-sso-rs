@@ -11,6 +11,7 @@ pub fn open_browser_url(url: &String) {
         error!("Opening your default browser to complete the authentication process");
     }
 }
+
 pub fn read_user_input() {
     io::stdout().flush().unwrap();
     let mut buffer = String::new();

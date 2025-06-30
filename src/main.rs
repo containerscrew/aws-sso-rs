@@ -37,8 +37,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Print welcome message
     println!(
-        "~> Welcome to {} \n~> Press ENTER when you accept the request in your browser",
+        "~> Welcome to {} \n~> Press {} when you accept the request in your browser",
         style("aws-sso-rs").bold().red(),
+        style("ENTER").bold().red(),
     );
 
     // Start AWS SDK APi Calls
@@ -58,6 +59,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let device_auth_credentials: DeviceAuthCredentials =
         get_device_authorization_credentials(&sso_idc_client, &device_credentials, &cli.start_url)
             .await?;
+
+    print!(
+        "~> Device Code: {} ",
+        style(&device_auth_credentials.user_code).bold().green()
+    );
 
     // Open default local browser with verification URL
     open_browser_url(&device_auth_credentials.verification_url);
@@ -149,7 +155,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         account_overrides,
     );
 
-    println!("{}Done in {}", SPARKLE, HumanDuration(started.elapsed()));
+    println!(
+        "~> Done in {} {}",
+        HumanDuration(started.elapsed()),
+        SPARKLE
+    );
 
     Ok(())
 }

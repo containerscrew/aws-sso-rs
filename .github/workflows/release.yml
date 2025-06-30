@@ -39,6 +39,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify version (avoid skipping Cargo.toml update)
+        run: |
+          CARGO_VERSION=$(grep '^version =' Cargo.toml | head -n1 | sed -E "s/version = \"([^\"]+)\"/\1/")
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/containerscrew/aws-sso-rs/releases/latest | jq -r ".name")
+
+          if [ "$CARGO_VERSION" != "$STABLE_VERSION" ]; then
+            echo "Cargo.toml version ($CARGO_VERSION) does not match stable.txt ($STABLE_VERSION). Skipping pipeline."
+            exit 0
+          fi
+
       - name: Set tag
         id: set_tag
         run: |
