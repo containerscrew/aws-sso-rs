@@ -70,16 +70,12 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          body: '[Changelog](https://github.com/containerscrew/aws-sso-rs/blob/main/CHANGELOG.md)'
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          generate_release_notes: true
           files: |
             CHANGELOG.md
             LICENSE
             *.zip
-        env:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generate_release_notes: true
-          append_body: true
-          TAG_NAME:
 
   publish-crate:
     name: Publish crate to creates.io
@@ -89,6 +85,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install latest Rust
+        run: |
+          rustup install stable
+          rustup default stable
       - name: Publish to creates.io
         uses: katyo/publish-crates@v2
         with:
