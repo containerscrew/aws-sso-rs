@@ -20,7 +20,7 @@ aws-sdk-ssooidc = "1.73.0"
 webbrowser = "1.0.4"
 shellexpand = "3.1.1"
 configparser = "3.1.0"
-indicatif = "0.17.11"
+indicatif = "0.18.0"
 
 [profile.release]
 strip = "debuginfo"
