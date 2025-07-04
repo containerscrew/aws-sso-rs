@@ -11,6 +11,7 @@ use console::{style, Emoji};
 use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::Semaphore;
 use tokio::time::Instant;
 use tracing::error;
 
@@ -99,14 +100,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .progress_chars("##-"),
     );
 
+    // Limit the number of concurrent tasks to avoid overwhelming the API
+    let semaphore = Arc::new(Semaphore::new(12));
+
     // Iterate over all accounts and get credentials for each account
     for account in account_list {
+        let permit = Arc::clone(&semaphore).acquire_owned().await.unwrap();
+
         let sso_client = sso_client.clone();
         let token = Arc::clone(&token);
         let pb = Arc::clone(&pb);
 
         join_handles.push(tokio::spawn(async move {
             let account_name = &account.account_name.unwrap();
+
             let account_credentials = match get_account_credentials(
                 &sso_client,
                 &account.account_id.unwrap(),
@@ -124,12 +131,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Err(err)
                 }
             };
+
             pb.set_message(format!("{account_name}"));
             pb.inc(1);
+
+            drop(permit); // Release slot for the next task
             account_credentials
         }));
-
-        tokio::time::sleep(std::time::Duration::from_millis(100)).await; // Throttle requests to avoid rate limiting
     }
 
     // Wait for all tasks to complete
