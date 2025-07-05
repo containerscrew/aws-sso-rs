@@ -32,7 +32,7 @@
 # About
 
 > [!NOTE]
-> Is this necessary in Rust? I don't think so. In Python, it could be 50/60? lines of code. But it's definitely more
+> Is this necessary in Rust? I don't think so. In Python, it could be 100/120? lines of code. But it's definitely more
 > fun.
 
 This is the tool I use every day to obtain local credentials (`~/.aws/credentials`) for all the accounts I have access
