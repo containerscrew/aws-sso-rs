@@ -53,6 +53,15 @@ pub struct Args {
         required = false
     )]
     pub account_overrides: Option<Vec<(String, String)>>,
+    #[arg(
+        short = 'w',
+        long = "workers",
+        help = "Number of max tasks (threads) to run in parallel.",
+        default_value_t = 5,
+        value_parser(clap::value_parser!(u8).range(1..=20)),
+        required = false
+    )]
+    pub workers: u8,
 }
 
 fn parse_key_val_string(s: &str) -> Result<(String, String), String> {

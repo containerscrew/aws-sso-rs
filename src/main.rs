@@ -101,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // Limit the number of concurrent tasks to avoid overwhelming the API
-    let semaphore = Arc::new(Semaphore::new(12));
+    let semaphore = Arc::new(Semaphore::new(cli.workers as usize));
 
     // Iterate over all accounts and get credentials for each account
     for account in account_list {

@@ -5,6 +5,7 @@
 </p>
 
 ---
+
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 [![License - MIT](https://img.shields.io/github/license/containerscrew/aws-sso-rs)](/LICENSE)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
@@ -16,7 +17,9 @@
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/aws-sso-rs/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=aws-sso-rs)
 ![Crates.io Downloads (recent)](https://img.shields.io/crates/dr/aws-sso-rs?style=flat&label=crates.io%20Downloads)
 ![Crates.io Version](https://img.shields.io/crates/v/aws-sso-rs)
+
 ---
+
 <p align="center">
     <h3 align="center">$ aws-sso-rs </h3>
     <img src="./assets/example-1.png" alt="example"/>
@@ -85,8 +88,8 @@ cargo build --release
 aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1
 ```
 
-* `--start-url` is the URL of your AWS SSO endpoint, which you can find in your AWS SSO console.
-* `--aws-region` is the AWS region where your SSO is configured, e.g., `eu-west-1`, `us-east-1`, etc.
+- `--start-url` is the URL of your AWS SSO endpoint, which you can find in your AWS SSO console.
+- `--aws-region` is the AWS region where your SSO is configured, e.g., `eu-west-1`, `us-east-1`, etc.
 
 > [!NOTE]
 > This command will open your default browser. You will need to approve manually the authentication.
@@ -135,6 +138,16 @@ aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-
 ```shell
 aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 --log-level debug
 ```
+
+## Workers
+
+If you have for example 40 accounts in your AWS organization, you can use the `--workers` flag to limit the number of concurrent tasks. This can help you avoid overwhelming the AWS API with too many requests (429) at once. More workers will speed up the process of fetching credentials for all accounts, but it may also lead to throttling if you set it too high.
+
+```shell
+aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 -w 10
+```
+
+> Default value is `5`, and the maximum value is `20`. You can change it by modifying the `--workers` flag.
 
 # Switching `AWS_PROFILE` in your terminal
 
