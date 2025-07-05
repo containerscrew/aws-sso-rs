@@ -25,6 +25,8 @@
     <img src="./assets/example-1.png" alt="example"/>
 </p>
 
+> This will open your default browser, [something like this](./assets/aws-auth-screen.png).
+
 ---
 
 # About
