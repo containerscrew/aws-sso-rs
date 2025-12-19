@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> `aws-sso-rs` was an experiment using the AWS SDK with Rust. Besides fulfilling a daily need to obtain AWS credentials via SSO, I decided to integrate more utilities like this into my other tool called [`cloudsnake`](https://github.com/containerscrew/cloudsnake). I will no longer be updating aws-sso-rs. This project will be archived.
+
 <p align="center" >
 <h3 align="center">aws-sso-rs</h3>
 <p align="center">Fetch your local ~/.aws/credentials using AWS SSO</p>
@@ -30,10 +33,6 @@
 ---
 
 # About
-
-> [!NOTE]
-> Is this necessary in Rust? I don't think so. In Python, it could be 100/120? lines of code. But it's definitely more
-> fun.
 
 This is the tool I use every day to obtain local credentials (`~/.aws/credentials`) for all the accounts I have access
 in my company’s AWS organization. We have AWS SSO configured with Google Workspaces. So, through a browser authenticated
