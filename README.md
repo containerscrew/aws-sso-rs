@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> `aws-sso-rs` was an experiment using the AWS SDK with Rust. Besides fulfilling a daily need to obtain AWS credentials via SSO, I decided to integrate more utilities like this into my other tool called [`cloudsnake`](https://github.com/containerscrew/cloudsnake). I will no longer be updating aws-sso-rs. This project will be archived.
+> `aws-sso-rs` was an experiment using the AWS SDK with Rust. Besides fulfilling a daily need to obtain AWS credentials via SSO, I decided to integrate more utilities like this into my other tool called [`cloudsnake`](https://github.com/containerscrew/cloudsnake). I will no longer be updating `aws-sso-rs`. This project will be archived.
 
 <p align="center" >
 <h3 align="center">aws-sso-rs</h3>
