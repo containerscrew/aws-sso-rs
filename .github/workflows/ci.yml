@@ -1,0 +1,208 @@
+name: CI
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+on:
+  pull_request:
+  push:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/ci.yml"
+    branches:
+      - "**"
+    tags:
+      - "v*.*.*"
+  schedule:
+    - cron: "0 7 * * 1"
+
+jobs:
+  security:
+    name: Security audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rustup
+        run: rustup toolchain install
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: security
+
+      - name: cargo-audit (RustSec advisories)
+        uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    needs: security
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rustup
+        run: rustup toolchain install
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: linting
+
+      - name: Rustfmt
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  test:
+    name: Test (${{ matrix.target }})
+    needs: linting
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+          - os: macos-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rustup
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.target }}
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: test-${{ matrix.target }}
+          key: ${{ matrix.target }}
+
+      - name: cargo test
+        run: cargo test --locked --target ${{ matrix.target }}
+
+  release:
+    name: Release (${{ matrix.release_for }})
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: test
+    strategy:
+      matrix:
+        include:
+          - release_for: linux-arm64
+            os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+          - release_for: linux-amd64
+            os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+
+          - release_for: darwin-amd64
+            os: macos-latest
+            target: x86_64-apple-darwin
+
+          - release_for: darwin-arm64
+            os: macos-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rustup
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.target }}
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: release-${{ matrix.target }}
+          key: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Package zip
+        run: |
+          ZIP=aws-sso-rs-${{ matrix.release_for }}-${{ github.ref_name }}.zip
+          zip -j "$ZIP" target/${{ matrix.target }}/release/aws-sso-rs
+          # Checksum consumed by install.sh (macOS has shasum, Linux sha256sum)
+          if command -v sha256sum >/dev/null 2>&1; then sha256sum "$ZIP" > "$ZIP.sha256"; else shasum -a 256 "$ZIP" > "$ZIP.sha256"; fi
+
+      - name: GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: true
+          files: |
+            CHANGELOG.md
+            LICENSE
+            *.zip
+            *.sha256
+
+  publish-crate:
+    name: Publish crate to crates.io
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rustup
+        run: rustup toolchain install
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: publish
+
+      - name: Publish to crates.io
+        run: |
+          cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          cargo publish --locked
+
+  dependabot-auto-merge:
+    name: Dependabot auto-merge
+    # The fork guard keeps this from running on forks of the repository, where
+    # a "dependabot" PR is not necessarily from the real bot.
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]' && !github.event.pull_request.head.repo.fork
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Auto-merge only patch/minor updates; a major bump gets reviewed by a
+      # human. Drop this condition if you want everything merged.
+      - name: Enable auto-merge for Dependabot PRs
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
