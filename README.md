@@ -46,7 +46,7 @@ each of them is tedious. `aws-sso-rs` runs the SSO device authorization flow onc
 `~/.aws/credentials`.
 
 - One browser approval, all accounts.
-- Concurrent fetching with a configurable number of workers.
+- Concurrent fetching of all accounts.
 - Profile names are predictable (`AccountName@RoleName`) and can be overridden.
 - Single static binary for Linux and macOS (amd64 and arm64).
 
@@ -126,16 +126,13 @@ aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-
 | --------------------- | -------------------------------------------------------------------- | ----------- |
 | `-s`, `--start-url`   | AWS SSO start URL. **Required**.                                     |             |
 | `-r`, `--aws-region`  | Region where SSO is configured.                                      | `us-east-1` |
-| `-w`, `--workers`     | Accounts processed in parallel (`1`-`20`).                           | `5`         |
 | `--role-overrides`    | Rename role names in the profiles, `role=newname[,role2=newname2]`.  |             |
 | `--account-overrides` | Rename account names in the profiles, `account=new[,account2=new2]`. |             |
 | `-l`, `--log-level`   | `error`, `warn`, `info`, `debug` or `trace`.                         | `info`      |
 | `--with-timestamp`    | Show a timestamp in each log line.                                   | off         |
 
-Use fewer workers if you hit AWS API throttling (`429`) with a large number of accounts, and more to go faster.
-
 ```shell
-aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1 -w 10
+aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1
 ```
 
 ### Logging

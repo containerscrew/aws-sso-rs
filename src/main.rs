@@ -10,7 +10,6 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::sync::Arc;
 use tiny_tracing::Logger;
-use tokio::sync::Semaphore;
 use tokio::time::Instant;
 use tracing::{Level, error, info, warn};
 
@@ -33,7 +32,6 @@ fn logger_selector(level: &str) -> Level {
     }
 }
 
-// #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
 #[tokio::main]
 async fn main() -> Result<(), BoxError> {
     let started = Instant::now();
@@ -100,13 +98,8 @@ async fn main() -> Result<(), BoxError> {
     // Store all join handles
     let mut join_handles = Vec::new();
 
-    // Limit the number of concurrent tasks to avoid overwhelming the API
-    let semaphore = Arc::new(Semaphore::new(cli.workers as usize));
-
     // Iterate over all accounts and get credentials for each account
     for account in account_list {
-        let permit = Arc::clone(&semaphore).acquire_owned().await.unwrap();
-
         let sso_client = sso_client.clone();
         let token = Arc::clone(&token);
 
@@ -132,7 +125,6 @@ async fn main() -> Result<(), BoxError> {
             };
 
             info!("{}", account_name);
-            drop(permit); // Release slot for the next task
             account_credentials
         }));
     }

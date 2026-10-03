@@ -20,14 +20,14 @@ The flow, in order:
 3. Poll `create_token` with the device code, respecting the `interval` returned by AWS,
    until the approval arrives or the authorization expires.
 4. List the accounts (`sso`), then for each account list its roles and get the role
-   credentials, in parallel and bounded by a semaphore (`--workers`).
+   credentials, concurrently with one `tokio` task per account.
 5. Write one profile per account/role pair, named `AccountName@RoleName` (after
    `--account-overrides` / `--role-overrides`), into `~/.aws/credentials`.
 
 Source layout:
 
 - `src/main.rs` — entry point: wires the flow above together, the logger
-  setup (`tiny-tracing`) and the worker/semaphore loop.
+  setup (`tiny-tracing`) and the per-account task loop.
 - `src/cli.rs` — `clap` derive definition (`Args`) and the `key=value` parser used by the
   override flags.
 - `src/utils.rs` — open the browser and `write_configuration`, which builds and writes
