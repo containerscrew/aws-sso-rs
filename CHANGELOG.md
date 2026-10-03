@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.6.0 - 2026-10-03
+#### Features
+- (**cli**) add --with-timestamp and tiny-tracing - (526584e) - containerscrew
+- poll device auth, drop progress bar - (7def483) - containerscrew
+#### Bug Fixes
+- (**cog**) set v tag prefix - (7c5143f) - containerscrew
+- (**deps**) drop legacy rustls from aws sdk - (271ad2f) - containerscrew
+#### Documentation
+- (**roadmap**) order items by priority - (84c4635) - containerscrew
+- document polling and logging options - (9cd195a) - containerscrew
+- add AGENTS.md and roadmap, update README - (5c8e7b3) - containerscrew
+#### Build system
+- (**install**) rewrite install script - (4ec65f1) - containerscrew
+- pin toolchain and add rustfmt config - (d7a8bb2) - containerscrew
+#### Continuous Integration
+- replace workflows with a single pipeline - (74336af) - containerscrew
+#### Refactoring
+- use buffer_unordered, drop tokio spawn - (98808e6) - containerscrew
+- remove semaphore and --workers flag - (dfcdf0f) - containerscrew
+#### Miscellaneous Chores
+- add cocogitto separator to changelog - (0e90d24) - containerscrew
+- fix clippy warnings - (c5fa358) - containerscrew
+- inline git pre-commit hook in cog.toml - (4511fb5) - containerscrew
+- remove git-cliff config - (359368d) - containerscrew
+- add cocogitto config and update hooks - (3cb5907) - containerscrew
+
+- - -
+
 ## [1.3.0] - 2025-06-30
 
 - Fix(cli): after help message
