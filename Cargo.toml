@@ -16,7 +16,6 @@ exclude = [
     "assets/",
     "cog.toml",
     "install.sh",
-    "pre-commit.sh",
     "roadmap.md",
     "rust-toolchain.toml",
     "rustfmt.toml",

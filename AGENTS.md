@@ -47,9 +47,10 @@ Root files:
 - `install.sh` — user-facing installer: detects OS/arch, downloads the release zip,
   verifies its `.sha256`, installs the binary. It is piped into `sh` by users, so treat it
   as security-sensitive.
-- `cog.toml` — cocogitto: conventional commits, `cog bump`, `CHANGELOG.md`.
-- `pre-commit.sh` and `.pre-commit-config.yaml` — hooks; `pre-commit.sh` is the driver
-  installed by `cog install-hook --all`.
+- `cog.toml` — cocogitto: conventional commits, `cog bump`, `CHANGELOG.md`, and the git
+  `pre-commit` hook script (`[git_hooks.pre-commit]`, installed by `cog install-hook --all`):
+  it runs `prek`, `cargo nextest run`, `cargo fmt --check` and `cargo check`.
+- `.pre-commit-config.yaml` — hooks run by `prek`/`pre-commit` (file hygiene, `gitleaks`).
 - `.github/workflows/ci.yml` — the only pipeline (see [CI](#ci)).
 - `.github/dependabot.yml` — weekly grouped updates for `cargo` and `github-actions`.
 - `roadmap.md` — numbered list of planned fixes and improvements, written for the
@@ -168,8 +169,10 @@ cog bump --auto           # semver derived from the commits since the last tag
 cog bump --version X.Y.Z  # explicit version
 ```
 
-`cog.toml` `pre_bump_hooks` set the version in `Cargo.toml`, refresh `Cargo.lock`, run
-fmt/clippy/tests and regenerate `CHANGELOG.md`; `post_bump_hooks` push `main` and the tag.
+`cog.toml` `pre_bump_hooks` set the version in `Cargo.toml`, refresh `Cargo.lock` and
+regenerate `CHANGELOG.md`. There are no `post_bump_hooks`: push `main` and the tag yourself
+(`git push origin main && git push origin vX.Y.Z`). fmt/clippy/tests no longer run as part of
+the bump; the git `pre-commit` hook and CI cover them.
 Pushing a `v*.*.*` tag triggers `release` and `publish-crate` in CI, which needs the
 `CARGO_REGISTRY_TOKEN` secret. The `Cargo.toml` version and the git tag must stay in sync.
 Required local tools: `cog` (cocogitto 7+) and `cargo-set-version` (from `cargo-edit`).
