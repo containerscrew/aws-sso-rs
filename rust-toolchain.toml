@@ -1,6 +1,9 @@
+# Single source of truth for the Rust version: pins the toolchain for every
+# contributor and for CI (`rustup toolchain install` reads this file), so
+# `cargo fmt`/`clippy` behave identically locally and in CI.
+# Bump it manually: Dependabot does not update this file.
 [toolchain]
-channel = "1.88.0"
-components = [
-    "clippy-preview",
-    "rustfmt-preview",
-]
+channel = "1.98.1"
+# Installed automatically on first cargo invocation — no `rustup component add`
+# step needed after cloning.
+components = ["clippy", "rustfmt"]

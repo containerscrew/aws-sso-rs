@@ -1,0 +1,6 @@
+# rustfmt only reads stable options from this file; anything nightly-only is
+# ignored on the stable toolchain the project pins in rust-toolchain.toml.
+edition = "2024"
+max_width = 100
+use_field_init_shorthand = true
+use_try_shorthand = true
