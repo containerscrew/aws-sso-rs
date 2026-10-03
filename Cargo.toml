@@ -28,9 +28,9 @@ tracing-subscriber = { version = "0.3.17", features = ["json"] }
 tracing = "0.1.40"
 clap = { version = "4.4.18", features = ["derive"] }
 aws-config = "1.6.3"
-aws-sdk-sso = "1.72.0"
+aws-sdk-sso = { version = "1.72.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
 tokio = { version = "1.45.0", features = ["full", "time"] }
-aws-sdk-ssooidc = "1.73.0"
+aws-sdk-ssooidc = { version = "1.73.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
 webbrowser = "1.0.4"
 shellexpand = "3.1.1"
 configparser = "3.1.0"
