@@ -6,7 +6,7 @@ Planned improvements for `aws-sso-rs`, roughly ordered by priority.
 2. **Secure file permissions.** Create `~/.aws/credentials` with `0600` when it does not exist.
 3. **Fix `--role-overrides` semantics.** A non-empty override currently replaces the whole profile name, so several accounts with the same role collide. It should produce `AccountName@new-role`, as documented.
 4. **Pagination.** Follow `next_token` in `list_accounts` and `list_account_roles` so organizations with many accounts or roles are fully fetched.
-5. **Remove panics.** Replace the `unwrap()` calls on SDK `Option` fields and task handles with proper error handling and a clear exit code.
+5. **Remove panics.** Replace the `unwrap()` calls on SDK `Option` fields with proper error handling and a clear exit code.
 6. **Honest error reporting.** Print a summary of the accounts that failed and exit non-zero when any of them did. Drop the misleading "Retrying..." message (retries are done by the SDK).
 7. **Do not leak secrets in logs.** Implement `Debug` for `AccountCredentials` manually, redacting keys and tokens.
 8. **Filtering options.** Add `--account`/`--role` filters (names or ids) to fetch only a subset of accounts.

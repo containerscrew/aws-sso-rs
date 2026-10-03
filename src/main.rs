@@ -6,9 +6,9 @@ use crate::aws::{
 use crate::cli::Args;
 use crate::utils::{open_browser_url, write_configuration};
 use clap::Parser;
+use futures_util::{StreamExt, stream};
 use std::collections::HashMap;
 use std::error::Error;
-use std::sync::Arc;
 use tiny_tracing::Logger;
 use tokio::time::Instant;
 use tracing::{Level, error, info, warn};
@@ -18,6 +18,9 @@ mod cli;
 mod utils;
 
 const RETRIES: u32 = 7;
+
+/// Maximum number of accounts whose credentials are fetched at the same time.
+const MAX_CONCURRENT_ACCOUNTS: usize = 15;
 
 type BoxError = Box<dyn Error + Send + Sync>;
 
@@ -81,61 +84,57 @@ async fn main() -> Result<(), BoxError> {
     );
 
     // The user must approve the request in the browser to continue, so poll until it is approved
-    let token = Arc::new(
-        poll_token(
-            &sso_idc_client,
-            &device_credentials,
-            &device_auth_credentials,
-        )
-        .await?,
-    );
+    let token = poll_token(
+        &sso_idc_client,
+        &device_credentials,
+        &device_auth_credentials,
+    )
+    .await?;
 
     // Get account list using the previous generate token
     let account_list = get_account_list(&sso_client, &token).await?;
 
-    let mut all_credentials: Vec<AccountCredentials> = vec![];
+    // Get the credentials of every account, at most MAX_CONCURRENT_ACCOUNTS at a time
+    let results: Vec<_> = stream::iter(account_list)
+        .map(|account| {
+            let sso_client = &sso_client;
+            let token = &token;
 
-    // Store all join handles
-    let mut join_handles = Vec::new();
+            async move {
+                let account_name = &account.account_name.unwrap();
 
-    // Iterate over all accounts and get credentials for each account
-    for account in account_list {
-        let sso_client = sso_client.clone();
-        let token = Arc::clone(&token);
+                let account_credentials = match get_account_credentials(
+                    sso_client,
+                    &account.account_id.unwrap(),
+                    token,
+                    account_name,
+                )
+                .await
+                {
+                    Ok(account_credentials) => Ok(account_credentials),
+                    Err(err) => {
+                        error!(
+                            "Error fetching credentials for {}. {}. Retrying...",
+                            account_name, err
+                        );
+                        Err(err)
+                    }
+                };
 
-        join_handles.push(tokio::spawn(async move {
-            let account_name = &account.account_name.unwrap();
+                info!("{}", account_name);
+                account_credentials
+            }
+        })
+        .buffer_unordered(MAX_CONCURRENT_ACCOUNTS)
+        .collect()
+        .await;
 
-            let account_credentials = match get_account_credentials(
-                &sso_client,
-                &account.account_id.unwrap(),
-                &token,
-                &account_name,
-            )
-            .await
-            {
-                Ok(account_credentials) => Ok(account_credentials),
-                Err(err) => {
-                    error!(
-                        "Error fetching credentials for {}. {}. Retrying...",
-                        &account_name, err
-                    );
-                    Err(err)
-                }
-            };
-
-            info!("{}", account_name);
-            account_credentials
-        }));
-    }
-
-    // Wait for all tasks to complete
-    for handle in join_handles {
-        match handle.await.unwrap() {
-            Ok(account_credentials) => all_credentials.extend(account_credentials),
-            Err(_) => {} // not necessary to do anything with the error, it's printed above
-        };
-    }
+    // Keep the successful accounts, the errors are already logged above
+    let all_credentials: Vec<AccountCredentials> = results
+        .into_iter()
+        .filter_map(Result::ok)
+        .flatten()
+        .collect();
 
     // Finally, write the config file
     let role_overrides: HashMap<String, String> =
@@ -152,7 +151,7 @@ async fn main() -> Result<(), BoxError> {
         account_overrides,
     );
 
-    info!("Done in {:?}", started.elapsed());
+    info!("Duration {:?} seconds", started.elapsed().as_secs());
 
     Ok(())
 }

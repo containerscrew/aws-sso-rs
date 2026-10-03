@@ -35,6 +35,7 @@ webbrowser = "1.0.4"
 shellexpand = "3.1.1"
 configparser = "3.1.0"
 tiny-tracing = "0.4.0"
+futures-util = "0.3"
 
 [profile.release]
 strip = "debuginfo"
