@@ -1,16 +1,3 @@
-<!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
-**Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [Changelog](#changelog)
-  - [[1.3.0] - 2025-06-30](#130---2025-06-30)
-  - [[1.2.0] - 2025-06-11](#120---2025-06-11)
-  - [[1.1.0] - 2025-06-11](#110---2025-06-11)
-  - [[1.0.0] - 2025-06-11](#100---2025-06-11)
-  - [[0.4.1] - 2023-11-19](#041---2023-11-19)
-  - [[0.4.0] - 2023-11-19](#040---2023-11-19)
-  - [[0.3.0] - 2023-11-18](#030---2023-11-18)
-  - [[0.2.0] - 2023-11-18](#020---2023-11-18)
-  - [[0.1.0] - 2023-11-18](#010---2023-11-18)
-<!-- END OF TOC -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -30,16 +17,19 @@ All notable changes to this project will be documented in this file.
 - Update console requirement from 0.15.11 to 0.16.0
 
 Updates the requirements on [console](https://github.com/console-rs/console) to permit the latest version.
+
 - [Release notes](https://github.com/console-rs/console/releases)
 - [Changelog](https://github.com/console-rs/console/blob/main/CHANGELOG.md)
 - [Commits](https://github.com/console-rs/console/compare/0.15.11...0.16.0)
 
 ---
+
 updated-dependencies:
+
 - dependency-name: console
   dependency-version: 0.16.0
   dependency-type: direct:production
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -100,11 +90,13 @@ Massive refactor, new clean version v1.0.0
 - Update aws-sdk-sso requirement from 0.39.0 to 1.72.0
 
 ---
+
 updated-dependencies:
+
 - dependency-name: aws-sdk-sso
   dependency-version: 1.72.0
   dependency-type: direct:production
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -115,16 +107,19 @@ Update aws-sdk-sso requirement from 0.39.0 to 1.72.0
 - Update webbrowser requirement from 0.8.15 to 1.0.4
 
 Updates the requirements on [webbrowser](https://github.com/amodm/webbrowser-rs) to permit the latest version.
+
 - [Release notes](https://github.com/amodm/webbrowser-rs/releases)
 - [Changelog](https://github.com/amodm/webbrowser-rs/blob/main/CHANGELOG.md)
 - [Commits](https://github.com/amodm/webbrowser-rs/compare/v0.8.15...v1.0.4)
 
 ---
+
 updated-dependencies:
+
 - dependency-name: webbrowser
   dependency-version: 1.0.4
   dependency-type: direct:production
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -135,11 +130,13 @@ Update webbrowser requirement from 0.8.15 to 1.0.4
 - Update aws-sdk-ssooidc requirement from 0.39.0 to 1.73.0
 
 ---
+
 updated-dependencies:
+
 - dependency-name: aws-sdk-ssooidc
   dependency-version: 1.73.0
   dependency-type: direct:production
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 

@@ -1,0 +1,43 @@
+# cocogitto configuration: conventional commits, version bump, changelog.
+# https://docs.cocogitto.io
+#
+# `branch_whitelist` must match the repository's default branch — `cog bump`
+# refuses to run from any other branch.
+from_latest_tag = true
+ignore_merge_commits = true
+ignore_fixup_commits = true
+disable_changelog = false
+disable_bump_commit = false
+branch_whitelist = ["main"]
+skip_untracked = false
+
+pre_bump_hooks = [
+    "cargo set-version {{version}}",
+    "cargo update --workspace --offline",
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo nextest run --all-features --no-tests=warn",
+    "cog changelog",
+]
+post_bump_hooks = [
+    # cog creates the bump commit directly via git2, which does not fire the
+    # local `post-commit` hook (the one that auto-pushes main). Push it
+    # explicitly here so the bump commit and its tag both land on the remote.
+    "git push origin main",
+    "git push origin {{version}}",
+]
+
+[git_hooks]
+[git_hooks.pre-commit]
+# Installed per clone with `cog install-hook --all` (.git/hooks is untracked).
+script = "./pre-commit.sh"
+
+# [commit_types]
+# feat = { changelog_title = "➕ Additional features" }
+# fix = { changelog_title = "🪲 Releases" }
+
+[changelog]
+path = "CHANGELOG.md"
+authors = [{ username = "containerscrew", signature = "dcrookie" }]
+
+[bump_profiles]
