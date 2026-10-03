@@ -1,165 +1,199 @@
-> [!IMPORTANT]
-> `aws-sso-rs` was an experiment using the AWS SDK with Rust. Besides fulfilling a daily need to obtain AWS credentials via SSO, I decided to integrate more utilities like this into my other tool called [`cloudsnake`](https://github.com/containerscrew/cloudsnake). I will no longer be updating `aws-sso-rs`. This project will be archived.
-
-<p align="center" >
-<h3 align="center">aws-sso-rs</h3>
-<p align="center">Fetch your local ~/.aws/credentials using AWS SSO</p>
-<p align="center">Built with ❤ in Rust</p>
+<p align="center">
+  <h1 align="center">aws-sso-rs</h1>
+  <p align="center">Fetch your local <code>~/.aws/credentials</code> for every AWS account you can access, using AWS SSO.</p>
+  <p align="center">Built with ❤ in Rust</p>
 </p>
-
----
-
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-[![License - MIT](https://img.shields.io/github/license/containerscrew/aws-sso-rs)](/LICENSE)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-![Code Size](https://img.shields.io/github/languages/code-size/containerscrew/aws-sso-rs)
-[![Build Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/build.yml)
-[![Lint Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/lint.yml/badge.svg)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/lint.yml)
-[![Release Pipeline](https://github.com/containerscrew/aws-sso-rs/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/containerscrew/aws-sso-rs/actions/workflows/release.yml)
-[![Release](https://img.shields.io/github/release/containerscrew/aws-sso-rs)](https://github.com/containerscrew/aws-sso-rs/releases/latest)
-[![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/aws-sso-rs/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=aws-sso-rs)
-![Crates.io Downloads (recent)](https://img.shields.io/crates/dr/aws-sso-rs?style=flat&label=crates.io%20Downloads)
-![Crates.io Version](https://img.shields.io/crates/v/aws-sso-rs)
-
----
 
 <p align="center">
-    <h3 align="center">$ aws-sso-rs </h3>
-    <img src="./assets/example-1.png" alt="example"/>
+  <a href="https://github.com/containerscrew/aws-sso-rs/actions/workflows/ci.yml"><img src="https://github.com/containerscrew/aws-sso-rs/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/containerscrew/aws-sso-rs/releases/latest"><img src="https://img.shields.io/github/v/release/containerscrew/aws-sso-rs?logo=github" alt="Release"></a>
+  <a href="https://crates.io/crates/aws-sso-rs"><img src="https://img.shields.io/crates/v/aws-sso-rs?logo=rust" alt="Crates.io version"></a>
+  <a href="https://crates.io/crates/aws-sso-rs"><img src="https://img.shields.io/crates/dr/aws-sso-rs?label=crates.io%20downloads" alt="Crates.io downloads"></a>
+  <a href="https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=aws-sso-rs"><img src="https://img.shields.io/github/downloads/containerscrew/aws-sso-rs/total.svg?logo=github&label=release%20downloads" alt="Release downloads"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/containerscrew/aws-sso-rs" alt="License"></a>
+  <img src="https://img.shields.io/badge/platform-linux%20%7C%20macOS-blue" alt="Platform">
+  <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="pre-commit"></a>
+  <img src="https://img.shields.io/github/languages/code-size/containerscrew/aws-sso-rs" alt="Code size">
 </p>
 
-> This will open your default browser, [something like this](./assets/aws-auth-screen.png).
+> [!NOTE]
+> AI coding assistants are used in this project only for architecture and design guidance,
+> documentation, keeping the repository structure clean and maintaining the docstrings of the
+> functions. They do not write application code unless explicitly instructed to. See
+> [AGENTS.md](./AGENTS.md) for the rules agents follow here.
 
----
+<p align="center">
+  <img src="./assets/example-1.png" alt="aws-sso-rs example"/>
+</p>
 
-# About
+## Table of contents
 
-This is the tool I use every day to obtain local credentials (`~/.aws/credentials`) for all the accounts I have access
-in my company’s AWS organization. We have AWS SSO configured with Google Workspaces. So, through a browser authenticated
-with my Google Gmail account, I authenticate via AWS SSO.
+- [Why aws-sso-rs](#why-aws-sso-rs)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Profile naming and overrides](#profile-naming-and-overrides)
+- [Switching `AWS_PROFILE`](#switching-aws_profile)
+- [Development](#development)
+- [Roadmap](#roadmap)
+- [License](#license)
 
-For example, we have 40 accounts in our AWS organization, and as a member of the cloud team, I have access to all of
-them. So, when using this tool, I will be able to get the credentials for all those accounts with the corresponding
-mapped role (in my case `AdministratorAccess`).
+## Why aws-sso-rs
 
-Therefore, you’ll need:
+If your organization has dozens of AWS accounts behind AWS IAM Identity Center (AWS SSO), getting CLI credentials for
+each of them is tedious. `aws-sso-rs` runs the SSO device authorization flow once and then fetches the credentials for
+**every account and role you have access to**, in parallel, writing them as ready-to-use profiles in
+`~/.aws/credentials`.
 
-- AWS SSO configured with your external `IdP`, which could be `Okta`, `Google Workspaces`, etc., and obtain an endpoint
-  like: https://mycompany.awsapps.com/start
+- One browser approval, all accounts.
+- Concurrent fetching with a configurable number of workers.
+- Profile names are predictable (`AccountName@RoleName`) and can be overridden.
+- Single static binary for Linux and macOS (amd64 and arm64).
 
-- To be authenticated in your `default` browser with the `IdP` you use (in my case, I’ve only tested it with the one I
-  use, which is `Gmail (Google)`).
+## Requirements
 
-# Installation
+- AWS IAM Identity Center configured with your IdP (Google Workspace, Okta, ...), and your start URL, for example
+  `https://mycompany.awsapps.com/start`.
+- A browser in which you are already authenticated with your IdP. It has only been tested with Google Workspace.
+- [`fzf`](https://github.com/junegunn/fzf) (optional), only for the [profile switcher](#switching-aws_profile).
 
-## From `creates.io`
+## Installation
+
+### From crates.io
 
 ```shell
 cargo install aws-sso-rs
 ```
 
-## Latest binary release
+### Pre-built binary
+
+The installer detects your OS and architecture, verifies the SHA256 checksum of the download and installs the binary
+in `/usr/local/bin`. It needs `curl` and `unzip`.
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/scripts/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/install.sh | sh
 ```
 
-### Specific binary version
+Install a specific version, or choose another directory:
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/scripts/install.sh | sh -s -- -v "v1.1.0"
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/install.sh | sh -s -- -v "v1.5.0"
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/aws-sso-rs/main/install.sh | INSTALLATION_PATH="$HOME/.local/bin" sh
 ```
 
-## Source code
+You can also download the zip for your platform from the [releases page](https://github.com/containerscrew/aws-sso-rs/releases).
+
+### From source
 
 ```shell
 git clone https://github.com/containerscrew/aws-sso-rs.git
 cd aws-sso-rs
 cargo build --release
-./target/release/aws-sso-rs --flags... ## see next usage section
+./target/release/aws-sso-rs --help
 ```
 
-> Windows not tested and compiled. Try it by yourself compiling this source code using `cargo build --release`
+> [!NOTE]
+> Windows is not tested nor released. You can try compiling it yourself with `cargo build --release`.
 
-# Usage
-
-## Basic usage
+## Usage
 
 ```shell
 aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1
 ```
 
-- `--start-url` is the URL of your AWS SSO endpoint, which you can find in your AWS SSO console.
-- `--aws-region` is the AWS region where your SSO is configured, e.g., `eu-west-1`, `us-east-1`, etc.
+1. Your default browser opens the AWS verification page. Check that the device code matches the one shown in the
+   terminal and approve the request.
+2. Go back to the terminal and press `Enter`.
+3. The credentials of all your accounts are fetched and written to `~/.aws/credentials`.
+
+<p align="center">
+  <img src="./assets/aws-auth-screen.png" alt="AWS authorization screen" width="600"/>
+</p>
+
+> [!WARNING]
+> `aws-sso-rs` currently **overwrites `~/.aws/credentials`** with the profiles it fetches, so any other profile in that
+> file (for example `default`) is lost. Back it up first. Merging instead of overwriting is the first item of the
+> [roadmap](./roadmap.md).
 
 > [!NOTE]
-> This command will open your default browser. You will need to approve manually the authentication.
+> The credentials are temporary (the duration is set by your SSO permission set, usually 1 hour). Run the tool again
+> when they expire.
 
-After you authenticate, you will come back to the terminal, and you will need to press `Enter` to continue.
+### Options
 
-Credentials will be stored in your `~/.aws/credentials` file, with the following format:
+| Flag                  | Description                                                          | Default     |
+| --------------------- | -------------------------------------------------------------------- | ----------- |
+| `-s`, `--start-url`   | AWS SSO start URL. **Required**.                                     |             |
+| `-r`, `--aws-region`  | Region where SSO is configured.                                      | `us-east-1` |
+| `-w`, `--workers`     | Accounts processed in parallel (`1`-`20`).                           | `5`         |
+| `--role-overrides`    | Rename role names in the profiles, `role=newname[,role2=newname2]`.  |             |
+| `--account-overrides` | Rename account names in the profiles, `account=new[,account2=new2]`. |             |
+| `-l`, `--log-level`   | `error`, `warn`, `info`, `debug` or `trace`.                         | `info`      |
+| `--with-timestamp`    | Show a timestamp in each log line.                                   | off         |
+
+Use fewer workers if you hit AWS API throttling (`429`) with a large number of accounts, and more to go faster.
+
+```shell
+aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1 -w 10
+```
+
+To debug the AWS SDK calls:
+
+```shell
+RUST_LOG=aws_config=trace,aws_smithy_runtime=debug aws-sso-rs --start-url https://mycompany.awsapps.com/start -r eu-west-1
+```
+
+> Rust AWS SDK logging documentation [here](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/logging.html)
+
+## Profile naming and overrides
+
+Each account and role pair becomes a profile named `AccountName@RoleName` (spaces in the account name are removed):
 
 ```ini
-[AccountName@RoleName]
+[Development@AdministratorAccess]
 aws_access_key_id = YOUR_ACCESS_KEY_ID
 aws_secret_access_key = YOUR_SECRET
 aws_session_token = YOUR_SESSION_TOKEN
 region = YOUR_REGION
 ```
 
-## Overriding the `AccountName@RoleName`
-
-You can override the `AccountName@RoleName` in your `~/.aws/credentials` by using the following flags:
+Rename the account part with `--account-overrides`:
 
 ```shell
-aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 --role-overrides cloudteam="" --account-overrides Development=development-account
-```
-
-Which will result in the following credentials file:
-
-```ini
-[Development@cloudteam] --> [development-account]
-```
-
-I'm changing the account name from `Development` to `development-account`, and the role name from `cloudteam` to an
-empty string (no role name in the credentials file).
-
-If you want to override the role name only, you can do it like this:
-
-```shell
-aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 --role-overrides Developer-Team="developer-role"
+aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1 --account-overrides Development=dev
 ```
 
 ```ini
-[AccountName@Developer-Team] --> [AccountName@developer-role]
+[Development@AdministratorAccess]  ->  [dev@AdministratorAccess]
 ```
 
-## Debug AWS SDK API calls
+Use an empty value in `--role-overrides` to drop the role from the profile name:
 
 ```shell
-aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 --log-level debug
+aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1 --role-overrides AdministratorAccess="" --account-overrides Development=dev
 ```
 
-## Workers
-
-If you have for example 40 accounts in your AWS organization, you can use the `--workers` flag to limit the number of concurrent tasks. This can help you avoid overwhelming the AWS API with too many requests (429) at once. More workers will speed up the process of fetching credentials for all accounts, but it may also lead to throttling if you set it too high.
-
-```shell
-aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-1 -w 10
+```ini
+[Development@AdministratorAccess]  ->  [dev]
 ```
 
-> Default value is `5`, and the maximum value is `20`. You can change it by modifying the `--workers` flag.
+> [!NOTE]
+> A non-empty `--role-overrides` value currently replaces the whole profile name, so it only makes sense when a single
+> account has that role. This is tracked in the [roadmap](./roadmap.md).
 
-# Switching `AWS_PROFILE` in your terminal
+## Switching `AWS_PROFILE`
 
-## Zsh/Bash shell
+A small shell function lets you pick one of the generated profiles with [`fzf`](https://github.com/junegunn/fzf).
 
-Copy the following function in your `~/.zshrc` or `~/.bashrc`:
+<details>
+<summary>Bash / Zsh</summary>
+
+Add this to your `~/.zshrc` or `~/.bashrc`:
 
 ```shell
 function aws-profile() {
     local AWS_PROFILES
-    AWS_PROFILES=$(cat ~/.aws/credentials | sed -n -e 's/^\[\(.*\)\]/\1/p' | fzf)
+    AWS_PROFILES=$(sed -n -e 's/^\[\(.*\)\]/\1/p' ~/.aws/credentials | fzf)
     if [[ -n "$AWS_PROFILES" ]]; then
         export AWS_PROFILE=$AWS_PROFILES
         echo "Selected profile: $AWS_PROFILES"
@@ -169,46 +203,55 @@ function aws-profile() {
 }
 ```
 
-Then, `source` the file if needed:
+</details>
 
-```shell
-source ~/.zshrc or source ~/.bashrc
-```
+<details>
+<summary>Fish</summary>
 
-## Fish shell
-
-Copy the following function inside `~/.config/fish/function/aws-profile.fish`
+Save this as `~/.config/fish/functions/aws-profile.fish`:
 
 ```shell
 function aws-profile
-    set -gx AWS_PROFILES $(cat ~/.aws/credentials | sed -n -e 's/^\[\(.*\)\]/\1/p' | fzf)
-    if test -n "$AWS_PROFILES"
-        set -xg AWS_PROFILE $AWS_PROFILES
-        echo "Selected profile: $AWS_PROFILES"
+    set -l selected (sed -n -e 's/^\[\(.*\)\]/\1/p' ~/.aws/credentials | fzf)
+    if test -n "$selected"
+        set -gx AWS_PROFILE $selected
+        echo "Selected profile: $selected"
     else
         echo "No profile selected"
     end
 end
 ```
 
-Then `source` the fish configuration:
+</details>
 
-```shell
-source ~/.config/fish/config.fish
-```
-
-## Setting AWS_PROFILE
-
-Type `aws-profile` in your terminal, and you will see all the accounts you have credentials in your
-`$HOME/.aws/credentials`
+Then run `aws-profile` in your terminal:
 
 <p align="center">
-    <h3 align="center">$ aws-profile </h3>
-    <img src="./assets/example-2.png" alt="example"/>
+  <img src="./assets/example-2.png" alt="aws-profile example"/>
 </p>
 
-> **fzf** is needed as a dependency for the interactive account switcher
+## Development
 
-# LICENSE
+```shell
+git clone https://github.com/containerscrew/aws-sso-rs.git
+cd aws-sso-rs
+cargo build
+cargo fmt --all -- --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test
+```
 
-`aws-sso-rs` is distributed under the terms of the [`GPL3`](./LICENSE).
+- Commits follow [Conventional Commits](https://www.conventionalcommits.org). Releases are cut with
+  [cocogitto](https://docs.cocogitto.io) (`cog bump`), configured in [`cog.toml`](./cog.toml).
+- Install the git hooks with `pre-commit install` ([pre-commit](https://pre-commit.com)) and `cog install-hook --all`.
+- Everything in CI (security audit, lint, tests, release and crates.io publish) lives in
+  [`.github/workflows/ci.yml`](./.github/workflows/ci.yml). Pushing a `v*.*.*` tag builds the binaries for Linux and
+  macOS, creates the GitHub release and publishes the crate.
+
+## Roadmap
+
+See [roadmap.md](./roadmap.md).
+
+## License
+
+`aws-sso-rs` is distributed under the terms of the [GPL-3.0](./LICENSE) license.
