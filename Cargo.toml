@@ -1,12 +1,26 @@
 [package]
 name = "aws-sso-rs"
 version = "1.5.0"
-edition = "2021"
+edition = "2024"
 authors = ["containerscrew info@containerscrew.com"]
-rust-version = "1.88.0"
 repository = "https://github.com/containerscrew/aws-sso-rs"
-license-file = "LICENSE"
+license = "GPL-3.0-only"
 description = "Fetch your ~/.aws/credentials using AWS SSO"
+readme = "README.md"
+keywords = ["aws", "sso", "credentials", "cli", "aws-sso"]
+categories = ["command-line-utilities"]
+exclude = [
+    ".github/",
+    "AGENTS.md",
+    ".pre-commit-config.yaml",
+    "assets/",
+    "cog.toml",
+    "install.sh",
+    "pre-commit.sh",
+    "roadmap.md",
+    "rust-toolchain.toml",
+    "rustfmt.toml",
+]
 
 [dependencies]
 console = "0.16.0"
@@ -21,9 +35,10 @@ webbrowser = "1.0.4"
 shellexpand = "3.1.1"
 configparser = "3.1.0"
 indicatif = "0.18.0"
+tiny-tracing = "0.4.0"
 
 [profile.release]
 strip = "debuginfo"
 
 [dev-dependencies]
-mockall = "0.14.0"
+mockall = "0.15.0"

@@ -1,23 +1,23 @@
 use crate::aws::{
-    generate_token, get_account_credentials, get_account_list,
-    get_device_authorization_credentials, register_device_credentials, AccountCredentials,
-    DeviceAuthCredentials, DeviceClientCredentials,
+    AccountCredentials, DeviceAuthCredentials, DeviceClientCredentials, generate_token,
+    get_account_credentials, get_account_list, get_device_authorization_credentials,
+    register_device_credentials,
 };
 use crate::cli::Args;
-use crate::logger::setup_logger;
 use crate::utils::{open_browser_url, read_user_input, write_configuration};
 use clap::Parser;
-use console::{style, Emoji};
+use console::{Emoji, style};
 use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
 use std::collections::HashMap;
+use std::error::Error;
 use std::sync::Arc;
+use tiny_tracing::Logger;
 use tokio::sync::Semaphore;
 use tokio::time::Instant;
-use tracing::error;
+use tracing::{Level, error, info};
 
 mod aws;
 mod cli;
-mod logger;
 
 mod utils;
 
@@ -25,23 +25,36 @@ const RETRIES: u32 = 7;
 
 static SPARKLE: Emoji<'_, '_> = Emoji("✨", ":-)");
 
+type BoxError = Box<dyn Error + Send + Sync>;
+
+fn logger_selector(level: &str) -> Level {
+    match level {
+        "info" => Level::INFO,
+        "warn" => Level::WARN,
+        "trace" => Level::TRACE,
+        "error" => Level::ERROR,
+        "debug" => Level::DEBUG,
+        _ => Level::INFO, // Default, even though clap cli restrict the value to one of from above
+    }
+}
+
 // #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), BoxError> {
     let started = Instant::now();
 
     // Setup cli
     let cli = Args::parse();
 
     // Logging
-    setup_logger(&cli.log_level);
+    let level = logger_selector(&cli.log_level.as_str());
+    let _guard = Logger::new()
+        .with_level(level)
+        .with_env_filter_from_env()
+        .with_timestamp(cli.with_timestamp)
+        .init()?;
 
-    // Print welcome message
-    println!(
-        "~> Welcome to {} \n~> Press {} when you accept the request in your browser",
-        style("aws-sso-rs").bold().red(),
-        style("ENTER").bold().red(),
-    );
+    info!("Welcome to aws-sso-rs. Press ENTER when you accept the request in your browser");
 
     // Start AWS SDK APi Calls
     let config = aws::init_config(&cli.aws_region).await;

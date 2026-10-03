@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{ArgAction, Parser};
 use console::style;
 
 #[derive(Parser, Debug)]
@@ -15,11 +15,18 @@ pub struct Args {
         short = 'l',
         long = "log-level",
         help = "Log level for logging tracing",
-        default_value = "error",
+        default_value = "info",
         value_parser = ["info", "warn", "trace", "debug", "error"],
         required = false
     )]
     pub log_level: String,
+    #[arg(
+        long = "with-timestamp",
+        help = "Show timestamp in the log",
+        action = ArgAction::SetTrue,
+        required = false
+    )]
+    pub with_timestamp: bool,
     #[arg(
         short = 's',
         long = "start-url",
@@ -81,5 +88,18 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!("Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: github.com/containerscrew/aws-sso-rs/issues")
+    format!(
+        "Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: github.com/containerscrew/aws-sso-rs/issues"
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_print_after_help_message() {
+        let expected = "Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: github.com/containerscrew/aws-sso-rs/issues";
+        assert_eq!(print_after_help_message(), expected);
+    }
 }

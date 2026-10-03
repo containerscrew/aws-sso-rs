@@ -1,6 +1,6 @@
 use crate::aws::AccountCredentials;
-use aws_config::retry::{RetryConfig, RetryMode};
 use aws_config::SdkConfig;
+use aws_config::retry::{RetryConfig, RetryMode};
 use aws_sdk_sso as sso;
 use aws_sdk_sso::types::AccountInfo;
 
@@ -23,7 +23,7 @@ pub async fn get_account_list(
     let account_list_output = client
         .list_accounts()
         .access_token(token)
-        .max_results(123)
+        .max_results(100)
         .send()
         .await?;
 
