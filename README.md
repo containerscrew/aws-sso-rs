@@ -103,7 +103,8 @@ aws-sso-rs --start-url https://mycompany.awsapps.com/start --aws-region eu-west-
 
 1. Your default browser opens the AWS verification page. Check that the device code matches the one shown in the
    terminal and approve the request.
-2. Go back to the terminal and press `Enter`.
+2. `aws-sso-rs` waits for your approval on its own, no need to go back to the terminal. The request expires after a
+   few minutes; if it does, run the command again.
 3. The credentials of all your accounts are fetched and written to `~/.aws/credentials`.
 
 <p align="center">
@@ -137,11 +138,23 @@ Use fewer workers if you hit AWS API throttling (`429`) with a large number of a
 aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1 -w 10
 ```
 
-To debug the AWS SDK calls:
+### Logging
+
+`--log-level` sets the base level for **every** target, including the AWS SDK and its dependencies, so
+`--log-level debug` is very verbose. For finer control, use the `RUST_LOG` environment variable: its per-target
+directives are applied on top of `--log-level`.
 
 ```shell
-RUST_LOG=aws_config=trace,aws_smithy_runtime=debug aws-sso-rs --start-url https://mycompany.awsapps.com/start -r eu-west-1
+# debug logs of aws-sso-rs only, everything else stays at --log-level (info)
+RUST_LOG=aws_sso_rs=debug aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1
+
+# debug logs of aws-sso-rs plus the AWS SDK HTTP calls
+RUST_LOG=aws_sso_rs=debug,aws_config=trace,aws_smithy_runtime=debug aws-sso-rs -s https://mycompany.awsapps.com/start -r eu-west-1
 ```
+
+> [!NOTE]
+> A global directive in `RUST_LOG` (one without a target, e.g. `RUST_LOG=warn`) takes precedence over
+> `--log-level`. A directive with a target (e.g. `aws_sso_rs=warn`) does not.
 
 > Rust AWS SDK logging documentation [here](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/logging.html)
 

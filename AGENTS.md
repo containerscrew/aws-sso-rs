@@ -16,9 +16,9 @@ The flow, in order:
 
 1. Register a public OIDC client (`sso-oidc`) and start a device authorization for the
    given `--start-url`.
-2. Open the verification URL in the default browser; the user approves it and presses
-   `Enter` in the terminal.
-3. Create the access token from the device code.
+2. Open the verification URL in the default browser and the user approves it.
+3. Poll `create_token` with the device code, respecting the `interval` returned by AWS,
+   until the approval arrives or the authorization expires.
 4. List the accounts (`sso`), then for each account list its roles and get the role
    credentials, in parallel and bounded by a semaphore (`--workers`).
 5. Write one profile per account/role pair, named `AccountName@RoleName` (after
@@ -26,13 +26,12 @@ The flow, in order:
 
 Source layout:
 
-- `src/main.rs` — entry point: wires the flow above together, progress bar and the
-  worker/semaphore loop.
+- `src/main.rs` — entry point: wires the flow above together, the logger
+  setup (`tiny-tracing`) and the worker/semaphore loop.
 - `src/cli.rs` — `clap` derive definition (`Args`) and the `key=value` parser used by the
   override flags.
-- `src/logger.rs` — `tracing-subscriber` setup from `--log-level`.
-- `src/utils.rs` — open the browser, wait for `Enter`, and `write_configuration`, which
-  builds and writes `~/.aws/credentials`.
+- `src/utils.rs` — open the browser and `write_configuration`, which builds and writes
+  `~/.aws/credentials`.
 - `src/aws/` — AWS SDK layer: `config.rs` (region/SDK config), `sso_oidc.rs` (device
   registration, authorization and token), `sso.rs` (accounts, roles and role
   credentials), `dto.rs` (the plain structs passed around).
@@ -113,7 +112,7 @@ There are no tests yet; adding them is on the roadmap.
 - Credentials, tokens, client secrets and the contents of `~/.aws/` must never end up in
   the repository, in logs, in test fixtures, in commit messages or in an agent transcript.
   `AccountCredentials` currently derives `Debug`; do not add log statements that print it.
-- Read `roadmap.md` items 1–8 before suggesting changes around `utils::write_configuration`
+- Read `roadmap.md` items 1–7 before suggesting changes around `utils::write_configuration`
   or the token handling: several known defects live there.
 - Vulnerability reports go through GitHub private reporting, never a public issue.
 
