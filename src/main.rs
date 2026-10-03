@@ -43,7 +43,7 @@ async fn main() -> Result<(), BoxError> {
     let cli = Args::parse();
 
     // Logging
-    let level = logger_selector(&cli.log_level.as_str());
+    let level = logger_selector(cli.log_level.as_str());
     let _guard = Logger::new()
         .with_level(level)
         .with_env_filter_from_env()

@@ -1,3 +1,6 @@
+// Cold path: the SDK error type is large but it is only built when a request fails.
+#![allow(clippy::result_large_err)]
+
 use crate::aws::AccountCredentials;
 use aws_config::SdkConfig;
 use aws_config::retry::{RetryConfig, RetryMode};
@@ -34,7 +37,7 @@ pub async fn get_account_credentials(
     client: &sso::client::Client,
     account_id: &String,
     token: &String,
-    account_name: &String,
+    account_name: &str,
 ) -> Result<Vec<AccountCredentials>, sso::Error> {
     let roles = client
         .list_account_roles()

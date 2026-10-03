@@ -79,9 +79,7 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!(
-        "Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: github.com/containerscrew/aws-sso-rs/issues"
-    )
+    "Author: containerscrew \nWebsite: github.com/containerscrew/aws-sso-rs\nLicense: GPL 3\nIssues: github.com/containerscrew/aws-sso-rs/issues".to_string()
 }
 
 #[cfg(test)]

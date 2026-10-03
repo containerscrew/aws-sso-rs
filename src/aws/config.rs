@@ -7,9 +7,8 @@ pub async fn init_config(region: impl Into<String>) -> SdkConfig {
         .or_default_provider()
         .or_else(Region::new("us-east-1"));
 
-    let config = aws_config::defaults(BehaviorVersion::latest())
+    aws_config::defaults(BehaviorVersion::latest())
         .region(region_provider)
         .load()
-        .await;
-    config
+        .await
 }

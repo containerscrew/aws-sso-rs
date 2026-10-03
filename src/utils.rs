@@ -3,9 +3,9 @@ use configparser::ini::Ini;
 use std::collections::HashMap;
 use tracing::error;
 
-pub fn open_browser_url(url: &String) {
+pub fn open_browser_url(url: &str) {
     // From the device authorization, open the URL in the browser
-    if !webbrowser::open(&*url).is_ok() {
+    if !webbrowser::open(url).is_ok() {
         error!("Opening your default browser to complete the authentication process");
     }
 }

@@ -1,3 +1,6 @@
+// Cold path: the SDK error type is large but it is only built when a request fails.
+#![allow(clippy::result_large_err)]
+
 use crate::aws::DeviceAuthCredentials;
 use crate::aws::dto::DeviceClientCredentials;
 use aws_config::SdkConfig;
