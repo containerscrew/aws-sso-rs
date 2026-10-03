@@ -1,29 +1,24 @@
 use crate::aws::{
-    AccountCredentials, DeviceAuthCredentials, DeviceClientCredentials, generate_token,
-    get_account_credentials, get_account_list, get_device_authorization_credentials,
+    AccountCredentials, DeviceAuthCredentials, DeviceClientCredentials, get_account_credentials,
+    get_account_list, get_device_authorization_credentials, poll_token,
     register_device_credentials,
 };
 use crate::cli::Args;
-use crate::utils::{open_browser_url, read_user_input, write_configuration};
+use crate::utils::{open_browser_url, write_configuration};
 use clap::Parser;
-use console::{Emoji, style};
-use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::Arc;
 use tiny_tracing::Logger;
 use tokio::sync::Semaphore;
 use tokio::time::Instant;
-use tracing::{Level, error, info};
+use tracing::{Level, error, info, warn};
 
 mod aws;
 mod cli;
-
 mod utils;
 
 const RETRIES: u32 = 7;
-
-static SPARKLE: Emoji<'_, '_> = Emoji("✨", ":-)");
 
 type BoxError = Box<dyn Error + Send + Sync>;
 
@@ -54,7 +49,10 @@ async fn main() -> Result<(), BoxError> {
         .with_timestamp(cli.with_timestamp)
         .init()?;
 
-    info!("Welcome to aws-sso-rs. Press ENTER when you accept the request in your browser");
+    info!(
+        "Welcome to aws-sso-rs. Approve the request in your browser, the program continues on its own"
+    );
+    warn!("Your ~/.aws/credentials will be overwritten once the credentials are fetched");
 
     // Start AWS SDK APi Calls
     let config = aws::init_config(&cli.aws_region).await;
@@ -74,21 +72,19 @@ async fn main() -> Result<(), BoxError> {
         get_device_authorization_credentials(&sso_idc_client, &device_credentials, &cli.start_url)
             .await?;
 
-    print!(
-        "~> Device Code: {} ",
-        style(&device_auth_credentials.user_code).bold().green()
-    );
+    info!("Device code: {}", &device_auth_credentials.user_code);
 
     // Open default local browser with verification URL
     open_browser_url(&device_auth_credentials.verification_url);
 
-    // To continue this program, user must accept the approval in the browser, without this we can't continue
-    // That's why we need to pause the program until the user press Enter
-    read_user_input();
+    info!(
+        "Verification URL: {}",
+        &device_auth_credentials.verification_url
+    );
 
-    // Generate token
+    // The user must approve the request in the browser to continue, so poll until it is approved
     let token = Arc::new(
-        generate_token(
+        poll_token(
             &sso_idc_client,
             &device_credentials,
             &device_auth_credentials,
@@ -104,15 +100,6 @@ async fn main() -> Result<(), BoxError> {
     // Store all join handles
     let mut join_handles = Vec::new();
 
-    let pb = Arc::new(ProgressBar::new(account_list.len() as u64));
-    pb.set_style(
-        ProgressStyle::with_template(
-            "{spinner:.red} [{elapsed_precise}] [\x1b[38;5;208m{bar:40}\x1b[0m] {pos}/{len} {msg}",
-        )
-        .unwrap()
-        .progress_chars("##-"),
-    );
-
     // Limit the number of concurrent tasks to avoid overwhelming the API
     let semaphore = Arc::new(Semaphore::new(cli.workers as usize));
 
@@ -122,7 +109,6 @@ async fn main() -> Result<(), BoxError> {
 
         let sso_client = sso_client.clone();
         let token = Arc::clone(&token);
-        let pb = Arc::clone(&pb);
 
         join_handles.push(tokio::spawn(async move {
             let account_name = &account.account_name.unwrap();
@@ -145,9 +131,7 @@ async fn main() -> Result<(), BoxError> {
                 }
             };
 
-            pb.set_message(format!("{account_name}"));
-            pb.inc(1);
-
+            info!("{}", account_name);
             drop(permit); // Release slot for the next task
             account_credentials
         }));
@@ -176,11 +160,7 @@ async fn main() -> Result<(), BoxError> {
         account_overrides,
     );
 
-    println!(
-        "~> Done in {} {}",
-        HumanDuration(started.elapsed()),
-        SPARKLE
-    );
+    info!("Done in {:?}", started.elapsed());
 
     Ok(())
 }

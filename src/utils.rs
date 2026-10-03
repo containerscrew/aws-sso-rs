@@ -1,8 +1,6 @@
 use crate::aws::AccountCredentials;
 use configparser::ini::Ini;
 use std::collections::HashMap;
-use std::io;
-use std::io::Write;
 use tracing::error;
 
 pub fn open_browser_url(url: &String) {
@@ -10,14 +8,6 @@ pub fn open_browser_url(url: &String) {
     if !webbrowser::open(&*url).is_ok() {
         error!("Opening your default browser to complete the authentication process");
     }
-}
-
-pub fn read_user_input() {
-    io::stdout().flush().unwrap();
-    let mut buffer = String::new();
-    io::stdin()
-        .read_line(&mut buffer)
-        .expect("Error reading enter key!");
 }
 
 pub fn extend_path(path: &str) -> String {

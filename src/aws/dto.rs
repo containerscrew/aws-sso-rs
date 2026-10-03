@@ -7,6 +7,8 @@ pub struct DeviceAuthCredentials {
     pub user_code: String,
     pub device_code: String,
     pub verification_url: String,
+    pub interval: u64,
+    pub expires_in: u64,
 }
 
 #[derive(Debug)]
