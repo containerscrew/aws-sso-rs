@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.7.0 - 2026-10-04
+#### Features
+- (**aws**) paginate accounts and roles - (607222a) - containerscrew
+#### Documentation
+- (**readme**) replace pre-commit with prek - (f9bb275) - containerscrew
+- remove pagination limits and close roadmap item - (44344c5) - containerscrew
+- document concurrency cap and 100 account limit - (fd9dc2d) - containerscrew
+- update example-1 image - (67cf163) - containerscrew
+
+- - -
+
 ## v1.6.0 - 2026-10-03
 #### Features
 - (**cli**) add --with-timestamp and tiny-tracing - (526584e) - containerscrew
