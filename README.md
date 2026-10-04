@@ -12,7 +12,7 @@
   <a href="https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=aws-sso-rs"><img src="https://img.shields.io/github/downloads/containerscrew/aws-sso-rs/total.svg?logo=github&label=release%20downloads" alt="Release downloads"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/containerscrew/aws-sso-rs" alt="License"></a>
   <img src="https://img.shields.io/badge/platform-linux%20%7C%20macOS-blue" alt="Platform">
-  <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="pre-commit"></a>
+  <a href="https://github.com/j178/prek"><img src="https://img.shields.io/badge/prek-enabled-brightgreen" alt="prek"></a>
   <img src="https://img.shields.io/github/languages/code-size/containerscrew/aws-sso-rs" alt="Code size">
 </p>
 
@@ -253,7 +253,9 @@ cargo test
 
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org). Releases are cut with
   [cocogitto](https://docs.cocogitto.io) (`cog bump`), configured in [`cog.toml`](./cog.toml).
-- Install the git hooks with `pre-commit install` ([pre-commit](https://pre-commit.com)) and `cog install-hook --all`.
+- Hooks in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml) are run by [prek](https://github.com/j178/prek), a
+  drop-in replacement for pre-commit. Install the git hooks with `cog install-hook --all`, which runs `prek` on every
+  commit.
 - Everything in CI (security audit, lint, tests, release and crates.io publish) lives in
   [`.github/workflows/ci.yml`](./.github/workflows/ci.yml). Pushing a `v*.*.*` tag builds the binaries for Linux and
   macOS, creates the GitHub release and publishes the crate.
