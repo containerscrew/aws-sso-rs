@@ -21,8 +21,8 @@ The flow, in order:
    until the approval arrives or the authorization expires.
 4. List the accounts (`sso`), then for each account list its roles and get the role
    credentials, concurrently (`futures-util`'s `buffer_unordered`, bounded by
-   `MAX_CONCURRENT_ACCOUNTS`, 15, to avoid AWS API throttling). Known limit: only the first
-   100 accounts are listed until pagination lands (`roadmap.md` item 1).
+   `MAX_CONCURRENT_ACCOUNTS`, 15, to avoid AWS API throttling). Accounts and roles are
+   fetched through the SDK paginators, so organizations of any size are fully listed.
 5. Write one profile per account/role pair, named `AccountName@RoleName` (after
    `--account-overrides` / `--role-overrides`), into `~/.aws/credentials`.
 
@@ -115,7 +115,7 @@ There are no tests yet; adding them is on the roadmap.
 - Credentials, tokens, client secrets and the contents of `~/.aws/` must never end up in
   the repository, in logs, in test fixtures, in commit messages or in an agent transcript.
   `AccountCredentials` currently derives `Debug`; do not add log statements that print it.
-- Read `roadmap.md` items 1–7 before suggesting changes around `utils::write_configuration`
+- Read `roadmap.md` items 1–6 before suggesting changes around `utils::write_configuration`
   or the token handling: several known defects live there.
 - Vulnerability reports go through GitHub private reporting, never a public issue.
 

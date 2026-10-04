@@ -246,9 +246,6 @@ Then run `aws-profile` in your terminal:
 - **Concurrency is capped at 15 accounts at a time.** This is a deliberate default to avoid AWS API throttling
   (HTTP 429 / `TooManyRequestsException`) from the IAM Identity Center portal API. Requests that are throttled are
   retried by the AWS SDK with backoff.
-- **At most 100 accounts are fetched.** `list_accounts` is called once with `max_results(100)` and pagination is not
-  implemented yet, so accounts beyond the first 100 are silently skipped. The same applies to roles in
-  `list_account_roles`. Support for organizations with many accounts is planned, see the [roadmap](./roadmap.md).
 
 ## Development
 
