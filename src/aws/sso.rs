@@ -29,7 +29,7 @@ pub async fn get_account_list(
         .into_paginator()
         .items()
         .send()
-        .collect::<Result<Vec<_>, _>>()
+        .try_collect()
         .await?;
 
     Ok(accounts)
@@ -48,7 +48,7 @@ pub async fn get_account_credentials(
         .into_paginator()
         .items()
         .send()
-        .collect::<Result<Vec<_>, _>>()
+        .try_collect()
         .await?;
 
     let mut account_credentials: Vec<AccountCredentials> = vec![];
