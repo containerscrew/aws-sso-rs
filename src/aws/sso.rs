@@ -23,14 +23,16 @@ pub async fn get_account_list(
     client: &sso::client::Client,
     token: &String,
 ) -> Result<Vec<AccountInfo>, sso::Error> {
-    let account_list_output = client
+    let accounts = client
         .list_accounts()
         .access_token(token)
-        .max_results(100)
+        .into_paginator()
+        .items()
         .send()
+        .collect::<Result<Vec<_>, _>>()
         .await?;
 
-    Ok(account_list_output.account_list.unwrap())
+    Ok(accounts)
 }
 
 pub async fn get_account_credentials(
@@ -43,12 +45,15 @@ pub async fn get_account_credentials(
         .list_account_roles()
         .account_id(account_id)
         .access_token(token)
+        .into_paginator()
+        .items()
         .send()
+        .collect::<Result<Vec<_>, _>>()
         .await?;
 
     let mut account_credentials: Vec<AccountCredentials> = vec![];
 
-    for role in roles.role_list.unwrap() {
+    for role in roles {
         let role_credentials = client
             .get_role_credentials()
             .role_name(role.role_name.clone().unwrap())

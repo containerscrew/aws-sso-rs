@@ -93,6 +93,7 @@ async fn main() -> Result<(), BoxError> {
 
     // Get account list using the previous generate token
     let account_list = get_account_list(&sso_client, &token).await?;
+    let total_accounts = account_list.len();
 
     // Get the credentials of every account, at most MAX_CONCURRENT_ACCOUNTS at a time
     let results: Vec<_> = stream::iter(account_list)
@@ -151,7 +152,10 @@ async fn main() -> Result<(), BoxError> {
         account_overrides,
     );
 
-    info!("Duration {:?} seconds", started.elapsed().as_secs());
+    info!(
+        "Duration {:?} seconds. {total_accounts} accounts updated 🚀",
+        started.elapsed().as_secs()
+    );
 
     Ok(())
 }
