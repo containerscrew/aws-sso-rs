@@ -21,7 +21,8 @@ The flow, in order:
    until the approval arrives or the authorization expires.
 4. List the accounts (`sso`), then for each account list its roles and get the role
    credentials, concurrently (`futures-util`'s `buffer_unordered`, bounded by
-   `MAX_CONCURRENT_ACCOUNTS`).
+   `MAX_CONCURRENT_ACCOUNTS`, 15, to avoid AWS API throttling). Known limit: only the first
+   100 accounts are listed until pagination lands (`roadmap.md` item 1).
 5. Write one profile per account/role pair, named `AccountName@RoleName` (after
    `--account-overrides` / `--role-overrides`), into `~/.aws/credentials`.
 

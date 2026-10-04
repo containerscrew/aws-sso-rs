@@ -34,6 +34,7 @@
 - [Usage](#usage)
 - [Profile naming and overrides](#profile-naming-and-overrides)
 - [Switching `AWS_PROFILE`](#switching-aws_profile)
+- [Limitations](#limitations)
 - [Development](#development)
 - [Roadmap](#roadmap)
 - [License](#license)
@@ -46,7 +47,7 @@ each of them is tedious. `aws-sso-rs` runs the SSO device authorization flow onc
 `~/.aws/credentials`.
 
 - One browser approval, all accounts.
-- Concurrent fetching of all accounts.
+- Concurrent fetching of accounts (15 at a time), see [Limitations](#limitations).
 - Profile names are predictable (`AccountName@RoleName`) and can be overridden.
 - Single static binary for Linux and macOS (amd64 and arm64).
 
@@ -239,6 +240,15 @@ Then run `aws-profile` in your terminal:
 <p align="center">
   <img src="./assets/example-2.png" alt="aws-profile example"/>
 </p>
+
+## Limitations
+
+- **Concurrency is capped at 15 accounts at a time.** This is a deliberate default to avoid AWS API throttling
+  (HTTP 429 / `TooManyRequestsException`) from the IAM Identity Center portal API. Requests that are throttled are
+  retried by the AWS SDK with backoff.
+- **At most 100 accounts are fetched.** `list_accounts` is called once with `max_results(100)` and pagination is not
+  implemented yet, so accounts beyond the first 100 are silently skipped. The same applies to roles in
+  `list_account_roles`. Support for organizations with many accounts is planned, see the [roadmap](./roadmap.md).
 
 ## Development
 

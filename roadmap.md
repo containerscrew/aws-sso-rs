@@ -2,7 +2,7 @@
 
 Planned improvements for `aws-sso-rs`, ordered by priority: correctness and data-safety first, then robustness, then features and tooling.
 
-1. **Pagination.** Follow `next_token` in `list_accounts` and `list_account_roles` so organizations with many accounts or roles are fully fetched.
+1. **Pagination (many-account organizations).** Today only the first 100 accounts are fetched (`list_accounts` is called once with `max_results(100)`), so larger organizations are silently truncated. Follow `next_token` in `list_accounts` and `list_account_roles` so organizations with many accounts or roles are fully fetched. Keep `MAX_CONCURRENT_ACCOUNTS` (15) bounded when doing so, to avoid AWS API throttling (429).
 2. **Do not overwrite `~/.aws/credentials`.** Read the existing file, merge the SSO profiles into it and keep every other profile (e.g. `default`). Create a backup before writing, and write the file once instead of once per account.
 3. **Secure file permissions.** Create `~/.aws/credentials` with `0600` when it does not exist.
 4. **Remove panics.** Replace the `unwrap()` calls on SDK `Option` fields with proper error handling and a clear exit code.
