@@ -18,8 +18,8 @@
 
 > [!NOTE]
 > AI coding assistants are used in this project for architecture and design guidance,
-> documentation, keeping the repository structure clean and maintaining the docstrings of the
-> functions. They may also help with non-critical code such as tests, examples or tooling,
+> documentation, keeping the repository structure clean and documenting the
+> code. They may also help with non-critical code such as tests, examples or tooling,
 > always reviewed by the maintainer. They are not used for `unsafe` code or to change the
 > core behaviour of the application unless explicitly instructed. See
 > [AGENTS.md](./AGENTS.md) for the rules agents follow here.
