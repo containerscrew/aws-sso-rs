@@ -60,7 +60,7 @@ Root files:
 ## What the agent does here
 
 **AI is used in this project for architecture and design guidance, documentation, a clean
-repository structure and keeping function docstrings accurate. It is not used to write
+repository structure and documenting the code. It is not used to write
 application code.** This tool handles live AWS credentials and rewrites a file the user
 depends on, so the code is written and reviewed by the maintainer.
 
@@ -72,7 +72,7 @@ By default:
   let the human write it.
 - **Review, don't rewrite.** After the human writes it, say what is wrong, missing or
   unsound. Point at the defect; do not silently correct it.
-- **Docstrings are yours.** Add and maintain `///` and `//!` doc comments so they match
+- **Code documentation is yours.** Add and maintain `///` and `//!` doc comments so they match
   what the code actually does. Touch comments only: a change that edits a doc comment
   must not change any code line next to it.
 - **Documentation and structure are yours.** `README.md`, this file, `roadmap.md`,
