@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.7.1 - 2026-10-20
+#### Documentation
+- document cog bump --patch in AGENTS.md - (f0cebcb) - containerscrew
+- reword docstrings as code documentation in AGENTS.md - (17d91c6) - containerscrew
+- reword AI-usage note: document the code - (af0ca07) - containerscrew
+- align AI-usage note in README - (f6c38bc) - containerscrew
+#### Build system
+- (**deps**) update Cargo.lock - (8efecc5) - containerscrew
+- (**deps**) raise minimum dependency versions - (c965869) - containerscrew
+#### Continuous Integration
+- (**security**) run cargo-audit directly - (8134657) - containerscrew
+#### Refactoring
+- (**aws**) use try_collect for paginators - (9e090bf) - containerscrew
+
+- - -
+
 ## v1.7.0 - 2026-10-04
 #### Features
 - (**aws**) paginate accounts and roles - (607222a) - containerscrew

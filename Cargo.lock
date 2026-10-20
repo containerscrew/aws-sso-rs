@@ -468,7 +468,7 @@ dependencies = [
 
 [[package]]
 name = "aws-sso-rs"
-version = "1.7.0"
+version = "1.7.1"
 dependencies = [
  "aws-config",
  "aws-sdk-sso",
