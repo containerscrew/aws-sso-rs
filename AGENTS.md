@@ -167,8 +167,13 @@ Versions are cut with cocogitto, never by editing the version by hand:
 
 ```bash
 cog bump --auto           # semver derived from the commits since the last tag
+cog bump --patch          # next patch, regardless of commit types
 cog bump --version X.Y.Z  # explicit version
 ```
+
+`--auto` only moves the version for `feat` and `fix`. For a release that carries only
+`ci`, `build(deps)` or `docs` commits (for example a dependency refresh users should
+receive), use `cog bump --patch`.
 
 `cog.toml` `pre_bump_hooks` set the version in `Cargo.toml`, refresh `Cargo.lock` and
 regenerate `CHANGELOG.md`. There are no `post_bump_hooks`: push `main` and the tag yourself
