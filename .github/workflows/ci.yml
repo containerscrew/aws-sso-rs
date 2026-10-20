@@ -38,10 +38,13 @@ jobs:
         with:
           shared-key: security
 
+      # Installed from source instead of via a third-party action. Swatinem/rust-cache
+      # keeps ~/.cargo/bin, so the build only happens when the cache is cold.
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
       - name: cargo-audit (RustSec advisories)
-        uses: rustsec/audit-check@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: cargo audit
 
   linting:
     name: Linting
